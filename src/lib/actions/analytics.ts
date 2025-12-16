@@ -39,14 +39,14 @@ export async function getAnalyticsData() {
         }
 
         // 2. Class Performance (Avg % in latest exam)
-        // Find latest exam for each class?
-        // Let's just pick 5 recent exams.
+        // TODO: Update Analytics for Multi-class Exam Schema
+        const examPerformance: any[] = [];
+        /*
         const recentExams = await ExamModel.find({})
             .sort({ date: -1 })
             .limit(5)
             .populate("classId", "name division");
 
-        const examPerformance = [];
         for (const exam of recentExams) {
             const results = await ResultModel.find({ examId: exam._id });
             let totalPercentage = 0;
@@ -67,6 +67,7 @@ export async function getAnalyticsData() {
                 avgPercentage: count > 0 ? (totalPercentage / count).toFixed(1) : 0
             });
         }
+        */
 
         return { attendanceStats, examPerformance };
 
