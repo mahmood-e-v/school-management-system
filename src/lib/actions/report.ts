@@ -30,7 +30,7 @@ export async function getExamsForClass(classId: string) {
     }
 }
 
-export async function generateClassReportSafe(examId: string, classId: string) {
+export async function generateClassReportSafe(examId: string, classId: string): Promise<any> {
     try {
         await dbConnect();
 
