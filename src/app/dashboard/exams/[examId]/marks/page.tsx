@@ -28,7 +28,7 @@ export default async function MarksEntryPage({ params, searchParams }: { params:
                         <BackButton />
                         <HomeButton />
                         <div>
-                            <h1 className="text-2xl font-bold">Select Class for {data.exam.name}</h1>
+                            <h1 className="text-2xl font-bold">Select Class for {data.exam?.name}</h1>
                         </div>
                     </div>
                 </div>
