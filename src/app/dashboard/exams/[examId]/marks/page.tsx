@@ -32,7 +32,7 @@ export default async function MarksEntryPage({ params, searchParams }: { params:
                         </div>
                     </div>
                 </div>
-                <ClassSelector examId={examId} classes={data.availableClasses} />
+                <ClassSelector examId={examId} classes={data.availableClasses || []} />
             </div>
         );
     }
@@ -60,7 +60,7 @@ export default async function MarksEntryPage({ params, searchParams }: { params:
             <MarksEntryTable
                 exam={data.exam}
                 sheet={data.sheet}
-                subjects={data.exam.currentSubjects}
+                subjects={data.exam.currentSubjects || []}
                 remarksList={remarksList}
             />
         </div>
