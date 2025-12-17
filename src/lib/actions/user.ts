@@ -44,7 +44,7 @@ export async function createUser(formData: FormData) {
 export async function getTeachers() {
     try {
         await dbConnect();
-        const teachers = await User.find({ role: "teacher" }).select("name email role permissions createdAt");
+        const teachers = await User.find({ role: { $in: ["teacher", "admin"] } }).select("name email role permissions createdAt");
         return JSON.parse(JSON.stringify(teachers));
     } catch (error) {
         console.error("Failed to fetch teachers:", error);
