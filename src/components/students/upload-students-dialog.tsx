@@ -54,63 +54,89 @@ export function UploadStudentsDialog() {
             }
 
             if (result.errors && result.errors.length > 0) {
-                toast.warning(`Total Errors: ${result.errors.length}. Check console for details.`);
-                console.log("Upload errors:", result.errors);
+                // Determine if we should show all errors or just a summary
+                const errorCount = result.errors.length;
+                toast.warning(`Upload completed with ${errorCount} errors. Checking details...`);
+                setErrors(result.errors); // New state to show errors in UI
+                // We will keep the dialog open to show errors
+                setOpen(true);
+            } else {
+                setErrors([]);
+                setOpen(false);
             }
+        }
+    }
 
-            setOpen(false);
+    const [errors, setErrors] = useState<string[]>([]);
+
+    function handleDialogChange(val: boolean) {
+        setOpen(val);
+        if (!val) {
+            setErrors([]); // Clear errors on close
         }
     }
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={handleDialogChange}>
             <DialogTrigger asChild>
                 <Button variant="outline">
                     <Upload className="mr-2 h-4 w-4" /> Upload Excel
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Upload Students</DialogTitle>
                     <DialogDescription>
                         Upload an Excel file (.xlsx) with columns: Name, RollNo, Class, Division.
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid items-center gap-4">
-                            <Label htmlFor="file">Excel File</Label>
-                            <Input
-                                id="file"
-                                name="file"
-                                type="file"
-                                accept=".xlsx, .xls"
-                                required
-                            />
+
+                {errors.length > 0 ? (
+                    <div className="bg-destructive/10 p-4 rounded-md border border-destructive/20 text-sm">
+                        <h4 className="font-semibold text-destructive mb-2 flex items-center gap-2">
+                            ⚠️ Upload Issues ({errors.length})
+                        </h4>
+                        <div className="max-h-[200px] overflow-y-auto space-y-1 pr-2">
+                            {errors.map((err, i) => (
+                                <p key={i} className="text-destructive-foreground border-b border-destructive/10 pb-1 last:border-0">{err}</p>
+                            ))}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                            <p>Template Format:</p>
-                            <ul className="list-disc pl-4 mt-1">
-                                <li>Name</li>
-                                <li>RollNo</li>
-                                <li>Class (e.g. Grade 10)</li>
-                                <li>Division (e.g. A)</li>
-                                <li>Parent Name (Optional)</li>
-                                <li>Parent ID (Optional)</li>
-                                <li>Phone (Optional)</li>
-                                <li>Transport (Bus/Car...)</li>
-                                <li>Bus Number (Optional)</li>
-                                <li>Parent Email (Optional)</li>
-                                <li>Student Email (Optional)</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? "Uploading..." : "Upload"}
+                        <Button variant="secondary" size="sm" onClick={() => setErrors([])} className="mt-4 w-full">
+                            Try Again
                         </Button>
-                    </DialogFooter>
-                </form>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid items-center gap-4">
+                                <Label htmlFor="file">Excel File</Label>
+                                <Input
+                                    id="file"
+                                    name="file"
+                                    type="file"
+                                    accept=".xlsx, .xls"
+                                    required
+                                />
+                            </div>
+                            <div className="text-sm text-muted-foreground">
+                                <p>Template Format:</p>
+                                <ul className="list-disc pl-4 mt-1 space-y-1">
+                                    <li>Name*</li>
+                                    <li>RollNo*</li>
+                                    <li>Class* (e.g. Grade 10)</li>
+                                    <li>Division* (e.g. A)</li>
+                                    <li>Parent Name</li>
+                                    <li>Phone</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit" disabled={loading}>
+                                {loading ? "Uploading..." : "Upload"}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                )}
             </DialogContent>
         </Dialog>
     );

@@ -9,7 +9,7 @@ import { BroadsheetView } from "@/components/reports/broadsheet-view";
 import { Loader2, Printer, FileSpreadsheet, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function ReportsPage({ classes }: { classes: any[] }) {
+export default function ReportsPage({ classes, schoolSettings }: { classes: any[], schoolSettings: any }) {
     const [selectedClass, setSelectedClass] = useState("");
     const [selectedExam, setSelectedExam] = useState("");
     const [exams, setExams] = useState<any[]>([]);
@@ -43,8 +43,8 @@ export default function ReportsPage({ classes }: { classes: any[] }) {
         window.print();
     }
 
-    // Mock School Info (Ideally from Settings)
-    const schoolInfo = {
+    // School Info from Props
+    const schoolInfo = schoolSettings || {
         name: "Madrasa Wadi Rahma",
         address: "Falaj Haza' Al Ain",
         logo: "https://placehold.co/80x80?text=Logo"

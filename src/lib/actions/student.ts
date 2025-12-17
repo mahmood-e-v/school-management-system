@@ -83,7 +83,7 @@ export async function uploadStudents(formData: FormData) {
                 continue;
             }
 
-            const classKey = `${Class}-${Division}`.toUpperCase();
+            const classKey = `${String(Class).trim()}-${String(Division).trim()}`.toUpperCase();
             const classId = classMap.get(classKey);
 
             if (!classId) {
