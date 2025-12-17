@@ -57,16 +57,46 @@ export async function uploadStudents(formData: FormData) {
 
             // Normalize keys: Lowercase and remove spaces
             const normalizedRow: any = {};
-            Object.keys(row as object).forEach(key => {
-                const normalizedKey = key.toLowerCase().replace(/[^a-z0-9]/g, "");
-                normalizedRow[normalizedKey] = (row as any)[key];
+            const originalKeys = Object.keys(row as object);
+
+            // fuzzy match helpers
+            const findKey = (keywords: string[]) => {
+                return originalKeys.find(k => {
+                    const norm = k.toLowerCase().replace(/[^a-z0-9]/g, "");
+                    return keywords.some(kw => norm.includes(kw));
+                });
+            };
+
+            // Map columns continuously or just once? Ideally once but rows might vary? No, structured data.
+            // But here we do it per row for safety.
+
+            originalKeys.forEach(key => {
+                const norm = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+                normalizedRow[norm] = (row as any)[key];
             });
 
-            // Extract using normalized keys with Aliases
-            const Name = normalizedRow['name'] || normalizedRow['studentname'] || normalizedRow['student'];
-            const RollNo = normalizedRow['rollno'] || normalizedRow['rollnumber'] || normalizedRow['roll'] || normalizedRow['id'];
-            const Class = normalizedRow['class'] || normalizedRow['classname'] || normalizedRow['grade'] || normalizedRow['standard'];
-            const Division = normalizedRow['division'] || normalizedRow['section'] || normalizedRow['batch'];
+            // Smart extraction
+            // We look for specific patterns in the keys present
+
+            // Name: "name", "studentname", "student" (but not "parentname")
+            let NameKey = Object.keys(normalizedRow).find(k => (k === 'name' || k === 'studentname' || k === 'student') && !k.includes('parent'));
+            // Fallback: Check if any key *contains* name but isn't parent
+            if (!NameKey) NameKey = Object.keys(normalizedRow).find(k => k.includes('name') && !k.includes('parent') && !k.includes('class') && !k.includes('roll'));
+
+            // RollNo
+            let RollKey = Object.keys(normalizedRow).find(k => k.includes('roll') || k === 'id' || k === 'admissionno');
+
+            // Class
+            let ClassKey = Object.keys(normalizedRow).find(k => k.includes('class') || k.includes('grade') || k.includes('standard'));
+
+            // Division
+            let DivKey = Object.keys(normalizedRow).find(k => k.includes('division') || k.includes('section') || k.includes('batch'));
+
+            // Extract values
+            const Name = normalizedRow[NameKey || 'name'];
+            const RollNo = normalizedRow[RollKey || 'rollno'];
+            const Class = normalizedRow[ClassKey || 'class'];
+            const Division = normalizedRow[DivKey || 'division'];
 
             // New fields mapping
             const ParentName = normalizedRow['parentname'];
