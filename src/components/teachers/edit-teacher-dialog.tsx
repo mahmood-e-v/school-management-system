@@ -87,6 +87,16 @@ export function EditTeacherDialog({ teacher }: EditTeacherDialogProps) {
                         </div>
 
                         <div className="grid items-center gap-4">
+                            <Label htmlFor="password">Change Password (Optional)</Label>
+                            <Input
+                                id="password"
+                                name="password"
+                                type="password"
+                                placeholder="Leave blank to keep current"
+                            />
+                        </div>
+
+                        <div className="grid items-center gap-4">
                             <Label htmlFor="role">Role</Label>
                             <select
                                 id="role"

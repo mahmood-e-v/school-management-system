@@ -65,12 +65,21 @@ export async function updateUser(formData: FormData) {
             return { error: "Missing required fields" };
         }
 
-        await User.findByIdAndUpdate(id, {
+        const password = formData.get("password") as string;
+
+        const updateData: any = {
             name,
             email,
             role,
             permissions,
-        });
+        };
+
+        if (password && password.trim() !== "") {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updateData.password = hashedPassword;
+        }
+
+        await User.findByIdAndUpdate(id, updateData);
 
         revalidatePath("/dashboard/teachers");
         return { success: true };
