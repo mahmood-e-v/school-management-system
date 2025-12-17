@@ -110,6 +110,23 @@ export function MarksEntryTable({ exam, sheet, subjects, remarksList }: MarksEnt
 
     const handleSaveClick = (e: React.MouseEvent) => {
         e.preventDefault();
+
+        // VALIDATION CHECK
+        let hasError = false;
+        sheet.forEach(student => {
+            subjects.forEach(sub => {
+                const mark = marks[student.studentId]?.[sub.name];
+                if (mark !== undefined && (mark > sub.totalMarks || mark < 0)) {
+                    hasError = true;
+                }
+            });
+        });
+
+        if (hasError) {
+            toast.error("Please fix invalid marks (highlighted in red) before saving.");
+            return;
+        }
+
         // Manually trigger the submit logic or just call handleSave
         handleSubmit2();
     };
@@ -207,13 +224,22 @@ export function MarksEntryTable({ exam, sheet, subjects, remarksList }: MarksEnt
                                         const currentRemark = remarks[student.studentId]?.[sub.name] ?? "";
 
                                         return (
-                                            <TableCell key={sub._id} className="border-l bg-accent/5 p-2">
-                                                <div className="flex items-center gap-1 justify-center">
+                                            <TableCell key={sub._id} className="border-l bg-accent/5 p-2 relative">
+                                                <div className="flex items-center gap-1 justify-center relative">
                                                     <Input
                                                         type="number"
                                                         value={currentMark}
                                                         onChange={(e) => {
                                                             const val = e.target.value;
+                                                            const numVal = Number(val);
+                                                            const isInvalid = numVal > sub.totalMarks || numVal < 0;
+
+                                                            // Update Errors State
+                                                            // We need a way to track errors. Let's add 'errors' state to the component first (I will do this in the next replacement chunk).
+                                                            // For now, assuming setErrors exists or I'll add it.
+                                                            // Actually, I should check isInvalid here and prevent update OR just highlight.
+                                                            // User request: "show warning and don't save"
+
                                                             setMarks(prev => ({
                                                                 ...prev,
                                                                 [student.studentId]: {
@@ -221,12 +247,20 @@ export function MarksEntryTable({ exam, sheet, subjects, remarksList }: MarksEnt
                                                                     [sub.name]: Number(val)
                                                                 }
                                                             }));
+
+                                                            // We will track invalid marks by derived state during render to show visual cue, 
+                                                            // and check validity before SAVE. 
                                                         }}
                                                         min={0}
                                                         max={sub.totalMarks}
-                                                        className="w-16 text-right h-8"
+                                                        className={`w-16 text-right h-8 ${currentMark > sub.totalMarks ? "border-red-500 bg-red-50 focus-visible:ring-red-500" : ""}`}
                                                         placeholder="-"
                                                     />
+                                                    {Number(currentMark) > sub.totalMarks && (
+                                                        <div className="absolute top-1 right-1 text-red-500">
+                                                            ⚠️
+                                                        </div>
+                                                    )}
                                                     {/* Subject Remark Popover */}
                                                     <Popover>
                                                         <PopoverTrigger asChild>

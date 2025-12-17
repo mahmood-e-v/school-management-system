@@ -167,7 +167,7 @@ export function AttendanceForm({ classes }: { classes: ClassType[] }) {
                                     <TableHead className="w-[100px]">Roll No</TableHead>
                                     <TableHead>Student Name</TableHead>
                                     <TableHead className="w-[100px]">Present</TableHead>
-                                    <TableHead>Remark</TableHead>
+                                    <TableHead>Reason of Absence</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -203,12 +203,22 @@ export function AttendanceForm({ classes }: { classes: ClassType[] }) {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            <Input
+                                            <Select
                                                 name={`remark-${student._id}`}
                                                 value={student.remark || ""}
-                                                onChange={(e) => handleRemarkChange(student._id, e.target.value)}
-                                                placeholder="Optional"
-                                            />
+                                                onValueChange={(value) => handleRemarkChange(student._id, value)}
+                                            >
+                                                <SelectTrigger className="w-[180px]">
+                                                    <SelectValue placeholder="Select Reason" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Sick">Sick</SelectItem>
+                                                    <SelectItem value="Long Leave">Long Leave</SelectItem>
+                                                    <SelectItem value="Excused Absence">Excused Absence</SelectItem>
+                                                    <SelectItem value="Family Function">Family Function</SelectItem>
+                                                    <SelectItem value="Other">Other</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </TableCell>
                                     </TableRow>
                                 ))}

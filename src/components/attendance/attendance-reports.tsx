@@ -12,12 +12,20 @@ import * as XLSX from "xlsx";
 import { Download, Search, FileSpreadsheet } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format } from "date-fns";
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Printer } from "lucide-react";
 
 interface AttendanceReportsProps {
     classes: any[];
 }
 
 export function AttendanceReports({ classes }: AttendanceReportsProps) {
+    const componentRef = useRef<HTMLDivElement>(null);
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+        documentTitle: `Attendance_Report`,
+    });
     // Monthly Report State
     const [selectedClass, setSelectedClass] = useState<string>("");
     const [selectedMonth, setSelectedMonth] = useState<string>(new Date().getMonth().toString());
@@ -213,6 +221,14 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
                             </Button>
                             <Button
                                 className="flex-1"
+                                onClick={() => handlePrint()}
+                                disabled={!monthlyReportData.length}
+                                variant="outline"
+                            >
+                                <Printer className="mr-2 h-4 w-4" /> Print PDF
+                            </Button>
+                            <Button
+                                className="flex-1"
                                 onClick={handleDownloadMonthlyExcel}
                                 disabled={!monthlyReportData.length}
                             >
@@ -221,7 +237,12 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
                         </div>
 
                         {monthlyReportData.length > 0 && (
-                            <div className="rounded-md border overflow-x-auto max-h-[500px]">
+                            <div className="rounded-md border overflow-x-auto" ref={componentRef}>
+                                <div className="p-4 hidden print:block mb-4">
+                                    <h1 className="text-2xl font-bold text-center">SCHOOL NAME HERE</h1>
+                                    <h2 className="text-xl font-semibold text-center mt-2">Monthly Attendance Report</h2>
+                                    <p className="text-center text-muted-foreground">{months[parseInt(selectedMonth)]} {selectedYear}</p>
+                                </div>
                                 <Table>
                                     <TableHeader>
                                         <TableRow>

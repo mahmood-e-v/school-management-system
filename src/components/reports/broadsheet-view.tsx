@@ -11,7 +11,17 @@ interface BroadsheetViewProps {
     className: string;
 }
 
+import { useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Printer } from "lucide-react";
+
 export function BroadsheetView({ reportData, examName, className }: BroadsheetViewProps) {
+    const componentRef = useRef<HTMLDivElement>(null);
+
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+        documentTitle: `${examName}_${className}_Marksheet`,
+    });
 
     // Extract unique subjects from the first student's result
     // (Assuming all students have same subjects, or we find unique union)
@@ -57,12 +67,22 @@ export function BroadsheetView({ reportData, examName, className }: BroadsheetVi
                     <h2 className="text-lg font-semibold">Class Marksheet (Broadsheet)</h2>
                     <p className="text-sm text-muted-foreground">{examName} - {className}</p>
                 </div>
-                <Button variant="outline" onClick={handleExport}>
-                    <Download className="mr-2 h-4 w-4" /> Export Excel
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => handlePrint()}>
+                        <Printer className="mr-2 h-4 w-4" /> Print / PDF
+                    </Button>
+                    <Button variant="outline" onClick={handleExport}>
+                        <Download className="mr-2 h-4 w-4" /> Export Excel
+                    </Button>
+                </div>
             </div>
 
-            <div className="rounded-md border bg-card overflow-hidden">
+            <div className="rounded-md border bg-card overflow-hidden" ref={componentRef}>
+                <div className="p-4 hidden print:block mb-4">
+                    <h1 className="text-2xl font-bold text-center">SCHOOL NAME HERE</h1>
+                    <h2 className="text-xl font-semibold text-center mt-2">{examName} - Marksheet</h2>
+                    <p className="text-center text-muted-foreground">Class: {className}</p>
+                </div>
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
