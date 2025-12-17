@@ -62,11 +62,11 @@ export async function uploadStudents(formData: FormData) {
                 normalizedRow[normalizedKey] = (row as any)[key];
             });
 
-            // Extract using normalized keys
-            const Name = normalizedRow['name'];
-            const RollNo = normalizedRow['rollno'];
-            const Class = normalizedRow['class'];
-            const Division = normalizedRow['division'];
+            // Extract using normalized keys with Aliases
+            const Name = normalizedRow['name'] || normalizedRow['studentname'] || normalizedRow['student'];
+            const RollNo = normalizedRow['rollno'] || normalizedRow['rollnumber'] || normalizedRow['roll'] || normalizedRow['id'];
+            const Class = normalizedRow['class'] || normalizedRow['classname'] || normalizedRow['grade'] || normalizedRow['standard'];
+            const Division = normalizedRow['division'] || normalizedRow['section'] || normalizedRow['batch'];
 
             // New fields mapping
             const ParentName = normalizedRow['parentname'];
