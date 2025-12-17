@@ -107,12 +107,30 @@ export async function uploadTeachers(formData: FormData) {
         const errors: any[] = [];
         const defaultPassword = await bcrypt.hash("school123", 10);
 
-        for (const row of jsonData as any[]) {
-            const name = row.Name || row.name;
-            const email = row.Email || row.email;
+        for (const [index, row] of (jsonData as any[]).entries()) {
+            const rowIndex = index + 2;
+
+            // Normalize keys: Lowercase and remove spaces
+            const normalizedRow: any = {};
+            // Fuzzy match keys
+            Object.keys(row).forEach(key => {
+                const norm = key.toLowerCase().replace(/[^a-z0-9]/g, "");
+                normalizedRow[norm] = row[key];
+            });
+
+            // Extract using fuzzy logic
+            // Name: matches 'name', 'teachername', 'fullname'
+            let NameKey = Object.keys(normalizedRow).find(k => k === 'name' || k.includes('teachername') || k.includes('fullname'));
+            if (!NameKey) NameKey = Object.keys(normalizedRow).find(k => k.includes('name') && !k.includes('email'));
+
+            // Email: matches 'email', 'mail'
+            let EmailKey = Object.keys(normalizedRow).find(k => k.includes('email') || k.includes('mail'));
+
+            const name = normalizedRow[NameKey || 'name'];
+            const email = normalizedRow[EmailKey || 'email'];
 
             if (!name || !email) {
-                errors.push({ row, error: "Missing Name or Email" });
+                errors.push(`Row ${rowIndex}: Missing Name or Email (Found keys: ${Object.keys(row).join(", ")})`);
                 continue;
             }
 
@@ -120,7 +138,7 @@ export async function uploadTeachers(formData: FormData) {
                 // Check for existing user
                 const existingUser = await User.findOne({ email });
                 if (existingUser) {
-                    errors.push({ row, error: "Email already exists" });
+                    errors.push(`Row ${rowIndex}: Email ${email} already exists`);
                     continue;
                 }
 
@@ -133,7 +151,7 @@ export async function uploadTeachers(formData: FormData) {
                 inserted++;
             } catch (error) {
                 console.error("Row error:", error);
-                errors.push({ row, error: "Database error" });
+                errors.push(`Row ${rowIndex}: Database error`);
             }
         }
 
