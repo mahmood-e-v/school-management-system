@@ -238,10 +238,16 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
 
                         {monthlyReportData.length > 0 && (
                             <div className="rounded-md border overflow-x-auto" ref={componentRef}>
-                                <div className="p-4 hidden print:block mb-4">
-                                    <h1 className="text-2xl font-bold text-center">SCHOOL NAME HERE</h1>
-                                    <h2 className="text-xl font-semibold text-center mt-2">Monthly Attendance Report</h2>
-                                    <p className="text-center text-muted-foreground">{months[parseInt(selectedMonth)]} {selectedYear}</p>
+                                <div className="p-4 hidden print:block mb-4 text-center">
+                                    <div className="flex justify-center items-center gap-4 mb-2">
+                                        <img src="https://placehold.co/80x80?text=Logo" alt="School Logo" className="h-20 w-20 object-contain" />
+                                        <div>
+                                            <h1 className="text-2xl font-bold uppercase">Madrasa Wadi Rahma</h1>
+                                            <p className="text-sm font-medium">Falaj Haza' Al Ain</p>
+                                        </div>
+                                    </div>
+                                    <h2 className="text-xl font-semibold mt-2">Monthly Attendance Report</h2>
+                                    <p className="text-muted-foreground">{months[parseInt(selectedMonth)]} {selectedYear}</p>
                                 </div>
                                 <Table>
                                     <TableHeader>
@@ -259,7 +265,7 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
                                     </TableHeader>
                                     <TableBody>
                                         {monthlyReportData.map((student, index) => (
-                                            <TableRow key={student.name + index}>
+                                            <TableRow key={`${student.rollNo}-${index}`}>
                                                 <TableCell>{index + 1}</TableCell>
                                                 <TableCell>{student.rollNo}</TableCell>
                                                 <TableCell className="font-medium whitespace-nowrap">{student.name}</TableCell>
@@ -296,8 +302,6 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
                                             defaultValue={String(new Date().getDate())}
                                             onValueChange={(val) => {
                                                 const day = parseInt(val);
-                                                // We can store state if we want to separate logic, for now render inline
-                                                // Actually better to have state
                                                 setSelectedDay(day);
                                             }}
                                         >
@@ -328,8 +332,8 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
                                                     <p className="text-muted-foreground italic">No students marked absent.</p>
                                                 ) : (
                                                     <ul className="list-disc pl-4 space-y-1">
-                                                        {monthlyReportData.filter(s => s.dailyStatus[selectedDay] === 'A').map(s => (
-                                                            <li key={s._id}>
+                                                        {monthlyReportData.filter(s => s.dailyStatus[selectedDay] === 'A').map((s, idx) => (
+                                                            <li key={`${s._id}-absent-${idx}`}>
                                                                 <span className="font-medium">{s.name}</span> <span className="text-muted-foreground text-xs">(Roll: {s.rollNo})</span>
                                                             </li>
                                                         ))}
@@ -350,8 +354,8 @@ export function AttendanceReports({ classes }: AttendanceReportsProps) {
                                                     <p className="text-muted-foreground italic">All students marked.</p>
                                                 ) : (
                                                     <ul className="list-disc pl-4 space-y-1">
-                                                        {monthlyReportData.filter(s => !s.dailyStatus[selectedDay] || s.dailyStatus[selectedDay] === '-').map(s => (
-                                                            <li key={s._id}>
+                                                        {monthlyReportData.filter(s => !s.dailyStatus[selectedDay] || s.dailyStatus[selectedDay] === '-').map((s, idx) => (
+                                                            <li key={`${s._id}-unknown-${idx}`}>
                                                                 <span className="font-medium">{s.name}</span> <span className="text-muted-foreground text-xs">(Roll: {s.rollNo})</span>
                                                             </li>
                                                         ))}

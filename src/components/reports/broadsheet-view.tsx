@@ -62,7 +62,7 @@ export function BroadsheetView({ reportData, examName, className }: BroadsheetVi
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between items-center bg-white p-4 rounded-lg border shadow-sm">
+            <div className="flex justify-between items-center bg-white p-4 rounded-lg border shadow-sm print:hidden">
                 <div>
                     <h2 className="text-lg font-semibold">Class Marksheet (Broadsheet)</h2>
                     <p className="text-sm text-muted-foreground">{examName} - {className}</p>
@@ -78,10 +78,16 @@ export function BroadsheetView({ reportData, examName, className }: BroadsheetVi
             </div>
 
             <div className="rounded-md border bg-card overflow-hidden" ref={componentRef}>
-                <div className="p-4 hidden print:block mb-4">
-                    <h1 className="text-2xl font-bold text-center">SCHOOL NAME HERE</h1>
-                    <h2 className="text-xl font-semibold text-center mt-2">{examName} - Marksheet</h2>
-                    <p className="text-center text-muted-foreground">Class: {className}</p>
+                <div className="p-4 hidden print:block mb-4 text-center">
+                    <div className="flex justify-center items-center gap-4 mb-2">
+                        <img src="https://placehold.co/80x80?text=Logo" alt="School Logo" className="h-20 w-20 object-contain" />
+                        <div>
+                            <h1 className="text-2xl font-bold uppercase">Madrasa Wadi Rahma</h1>
+                            <p className="text-sm font-medium">Falaj Haza' Al Ain</p>
+                        </div>
+                    </div>
+                    <h2 className="text-xl font-semibold mt-2">{examName} - Marksheet</h2>
+                    <p className="text-muted-foreground">Class: {className}</p>
                 </div>
                 <div className="overflow-x-auto">
                     <Table>

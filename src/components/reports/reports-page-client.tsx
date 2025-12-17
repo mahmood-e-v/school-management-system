@@ -45,9 +45,9 @@ export default function ReportsPage({ classes }: { classes: any[] }) {
 
     // Mock School Info (Ideally from Settings)
     const schoolInfo = {
-        name: "Springfield High School",
-        address: "123 School Lane, Springfield, IL",
-        logo: ""
+        name: "Madrasa Wadi Rahma",
+        address: "Falaj Haza' Al Ain",
+        logo: "https://placehold.co/80x80?text=Logo"
     };
 
     // Find class name for report
@@ -55,11 +55,12 @@ export default function ReportsPage({ classes }: { classes: any[] }) {
 
     return (
         <div className="p-6">
-            <div className="no-print mb-8 space-y-4">
-                <h1 className="text-2xl font-bold">Exam Reports</h1>
+            <div className="mb-8 space-y-4">
+                <h1 className="text-2xl font-bold print:hidden">Exam Reports</h1>
 
                 {/* Controls */}
-                <div className="flex flex-wrap gap-4 items-end bg-card p-4 rounded-lg border shadow-sm">
+                {/* Controls */}
+                <div className="flex flex-wrap gap-4 items-end bg-card p-4 rounded-lg border shadow-sm print:hidden">
                     <div className="space-y-2 w-[200px]">
                         <label className="text-sm font-medium">Select Class</label>
                         <Select onValueChange={handleClassChange} value={selectedClass}>
@@ -96,7 +97,7 @@ export default function ReportsPage({ classes }: { classes: any[] }) {
 
                 {reportData && (
                     <Tabs defaultValue="cards" className="w-full" onValueChange={setViewMode}>
-                        <div className="flex justify-between items-center mb-4">
+                        <div className="flex justify-between items-center mb-4 print:hidden">
                             <TabsList>
                                 <TabsTrigger value="cards" className="flex gap-2">
                                     <FileText className="h-4 w-4" /> Report Cards
