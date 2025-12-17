@@ -126,19 +126,31 @@ export async function uploadTeachers(formData: FormData) {
             // Email: matches 'email', 'mail'
             let EmailKey = Object.keys(normalizedRow).find(k => k.includes('email') || k.includes('mail'));
 
-            const name = normalizedRow[NameKey || 'name'];
-            const email = normalizedRow[EmailKey || 'email'];
+            let name = normalizedRow[NameKey || 'name'];
+            let email = normalizedRow[EmailKey || 'email'];
+
+            // Handle Type safety and trimming
+            if (typeof name === 'string') name = name.trim();
+            if (typeof email === 'string') email = email.trim().toLowerCase();
+
+            // Skip empty rows (common in Excel)
+            if (!name && !email) {
+                // Just skip, don't error, as it's likely a ghost row
+                continue;
+            }
 
             if (!name || !email) {
-                errors.push(`Row ${rowIndex}: Missing Name or Email (Found keys: ${Object.keys(row).join(", ")})`);
+                errors.push(`Row ${rowIndex}: Missing Name or Email (Name: ${name || 'missing'}, Email: ${email || 'missing'})`);
                 continue;
             }
 
             try {
-                // Check for existing user
-                const existingUser = await User.findOne({ email });
+                // Check for existing user (case-insensitive due to lowercase above)
+                // Also ensure DB check is case insensitive just in case
+                const existingUser = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+
                 if (existingUser) {
-                    errors.push(`Row ${rowIndex}: Email ${email} already exists`);
+                    errors.push(`Row ${rowIndex}: Email '${email}' already exists`);
                     continue;
                 }
 
