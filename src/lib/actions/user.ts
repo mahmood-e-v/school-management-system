@@ -4,6 +4,7 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
+import * as XLSX from "xlsx";
 
 export async function createUser(formData: FormData) {
     try {
@@ -99,9 +100,9 @@ export async function uploadTeachers(formData: FormData) {
         }
 
         const buffer = await file.arrayBuffer();
-        const workbook = (await import("xlsx")).read(buffer);
+        const workbook = XLSX.read(buffer, { type: "buffer" });
         const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = (await import("xlsx")).utils.sheet_to_json(worksheet);
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
         let inserted = 0;
         const errors: any[] = [];

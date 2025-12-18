@@ -29,31 +29,48 @@ export async function createExam(formData: FormData) {
         const startDate = formData.get("startDate") as string;
         const endDate = formData.get("endDate") as string;
 
-        // Handle Class IDs (expecting JSON string or multiple values, let's use JSON string for simplicity from client)
-        const classIdsJson = formData.get("classIds") as string;
-        const classIds = JSON.parse(classIdsJson || "[]");
+        // Handle Grade-based assignments (expecting JSON string)
+        // Format: [{ gradeName: string, subjects: [{ name: string, totalMarks: number }] }]
+        const gradeAssignmentsJson = formData.get("gradeAssignments") as string;
+        const gradeAssignments = JSON.parse(gradeAssignmentsJson || "[]");
 
-        // Handle Subjects (expecting JSON string)
-        const subjectsJson = formData.get("subjects") as string;
-        const subjects = JSON.parse(subjectsJson || "[]");
-
-        if (!name || !academicYear || !startDate || classIds.length === 0 || subjects.length === 0) {
+        if (!name || !academicYear || !startDate || gradeAssignments.length === 0) {
             return { error: "Missing required fields" };
         }
 
-        // Map common subjects to each selected class
-        const classes = classIds.map((id: string) => ({
-            classId: id,
-            subjects: subjects // Apply same subjects to all selected classes
-        }));
+        // Fetch all classes to map gradeNames to individual classIds
+        const allClasses = await ClassModel.find({});
+
+        const finalClasses: any[] = [];
+
+        for (const ga of gradeAssignments) {
+            const matchingClasses = allClasses.filter(c => c.name === ga.gradeName);
+
+            if (matchingClasses.length === 0) {
+                console.warn(`No classes found for grade: ${ga.gradeName}`);
+                continue;
+            }
+
+            // Assign same subjects to every division in this grade
+            matchingClasses.forEach(cls => {
+                finalClasses.push({
+                    classId: cls._id,
+                    subjects: ga.subjects
+                });
+            });
+        }
+
+        if (finalClasses.length === 0) {
+            return { error: "Could not find any matching classes for the selected grades." };
+        }
 
         await ExamModel.create({
             name,
             academicYear,
             startDate: new Date(startDate),
             endDate: endDate ? new Date(endDate) : undefined,
-            classes,
-            status: "Draft" // Default to Draft
+            classes: finalClasses,
+            status: "Draft"
         });
 
         revalidatePath("/dashboard/exams");
