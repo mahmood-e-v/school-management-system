@@ -4,6 +4,7 @@ import dbConnect from "@/lib/db";
 import ResultModel from "@/models/Result";
 import ExamModel from "@/models/Exam";
 import StudentModel from "@/models/Student";
+import "@/models/Class"; // Setup Class model for populate
 import { revalidatePath } from "next/cache";
 
 export async function getExamSheetFinal(examId: string, classId?: string) {
