@@ -136,9 +136,18 @@ export async function saveExamMarks(examId: string, classId: string, formData: F
                 const subRemark = formData.get(`remark-${studentId}-${subject.name}`);
 
                 if (val !== null && val !== "") {
+                    let numVal = Number(val);
+                    if (isNaN(numVal)) {
+                        console.warn(`Invalid mark value for student ${studentId} subject ${subject.name}: ${val}`);
+                        // Optionally default to 0 or skip. Let's skip invalid marks but log it.
+                        // Or better, set to 0 to avoid losing the entry entirely? 
+                        // User likely wants it to work. If it's Excel upload error, maybe 0 is safer than crashing.
+                        numVal = 0;
+                    }
+
                     studentMarks.push({
                         subject: subject.name,
-                        obtained: Number(val),
+                        obtained: numVal,
                         total: subject.totalMarks,
                         remarks: String(subRemark || "")
                     });
