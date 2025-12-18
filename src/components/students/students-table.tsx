@@ -189,6 +189,7 @@ export function StudentsTable({ initialStudents, classes, canManage }: StudentsT
                                                 <ManageStudentDialog
                                                     mode="edit"
                                                     student={student}
+                                                    classes={classes}
                                                     classId={student.classId?._id}
                                                     onSuccess={handleSuccess}
                                                 />

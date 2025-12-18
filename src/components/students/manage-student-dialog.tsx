@@ -29,13 +29,24 @@ interface ManageStudentDialogProps {
 export function ManageStudentDialog({ mode, student, classId: preSelectedClassId, classes, onSuccess }: ManageStudentDialogProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [selectedClassId, setSelectedClassId] = useState(preSelectedClassId || "");
+    const [selectedClassId, setSelectedClassId] = useState(
+        student?.classId?._id || student?.classId || preSelectedClassId || ""
+    );
     const [warningMsg, setWarningMsg] = useState<string | null>(null);
+
+    // If student prop changes (e.g. reused dialog), update state - though typically Key changes remounts.
+    // relying on initial state is fine if component keys are unique in parent.
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setLoading(true);
         const formData = new FormData(event.currentTarget);
+
+        // Ensure classId is explicitly sent if selected, otherwise rely on existing or preselected
+        const finalClassId = selectedClassId || preSelectedClassId;
+        if (finalClassId) {
+            formData.append("classId", finalClassId);
+        }
 
         // Pre-handle warning if confirmed
         if (warningMsg) {
@@ -43,13 +54,12 @@ export function ManageStudentDialog({ mode, student, classId: preSelectedClassId
         }
 
         if (mode === "add") {
-            const finalClassId = preSelectedClassId || selectedClassId;
             if (!finalClassId) {
                 toast.error("Please select a class");
                 setLoading(false);
                 return;
             }
-            formData.append("classId", finalClassId);
+            // formData already has classId appended above
             const result = await addStudent(formData);
 
             if (result.error) {
@@ -67,6 +77,7 @@ export function ManageStudentDialog({ mode, student, classId: preSelectedClassId
             }
         } else {
             formData.append("id", student._id);
+            // Class ID is already updated in formData if we changed it
             const result = await updateStudent(formData);
             if (result.error) {
                 toast.error(result.error);
@@ -117,7 +128,8 @@ export function ManageStudentDialog({ mode, student, classId: preSelectedClassId
 
                 <form onSubmit={handleSubmit}>
                     <div className="grid gap-4 py-4">
-                        {!preSelectedClassId && classes && classes.length > 0 && (
+                        {/* Show Class Select if classes are provided, regardless of mode (Add/Edit) or preselection */}
+                        {classes && classes.length > 0 && (
                             <div className="grid gap-2">
                                 <Label htmlFor="classSelect">Class *</Label>
                                 <Select onValueChange={setSelectedClassId} value={selectedClassId}>

@@ -234,11 +234,40 @@ export async function updateStudent(formData: FormData) {
             parentEmail: formData.get("parentEmail"),
         };
 
-        // Remove undefined/empty strings if needed? Or just overwrite.
-        // Mongoose handles partial updates fine.
+        const newClassId = formData.get("classId") as string;
+        if (newClassId) {
+            updateData.classId = newClassId;
+        }
+
+        // Validate Roll No collision in target class (excluding self)
+        // We need existing or new classId to check scope. If classId is not in formData, we might miss check?
+        // But dialog always sends classId if selected. If not sent, we assume no change? 
+        // Dialog sends it if selectedClassId was set.
+        if (updateData.rollNo && (newClassId || updateData.rollNo)) {
+            // We need robust check. If classId not in formData, we'd need to fetch current student to know class.
+            // But UI sends it. Let's assume if we update roll or class, we check.
+            // If class not sent, we can't fully check unless we fetch current. 
+            // Ideally we should always fetch current to be safe.
+            const currentStudent = await StudentModel.findById(id);
+            if (!currentStudent) return { error: "Student not found" };
+
+            const targetClassId = newClassId || currentStudent.classId;
+            const targetRollNo = updateData.rollNo || currentStudent.rollNo;
+
+            const collision = await StudentModel.findOne({
+                classId: targetClassId,
+                rollNo: targetRollNo,
+                _id: { $ne: id }
+            });
+
+            if (collision) {
+                return { error: `Roll No ${targetRollNo} already exists in that class.` };
+            }
+        }
 
         await StudentModel.findByIdAndUpdate(id, updateData);
         revalidatePath("/dashboard/classes");
+        revalidatePath("/dashboard/students"); // Also revalidate global list
         return { success: true };
     } catch (error) {
         console.error("Update student error:", error);
