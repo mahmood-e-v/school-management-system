@@ -41,9 +41,6 @@ const ExamSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Force model rebuild if schema changes in development
-if (mongoose.models.Exam) {
-    delete mongoose.models.Exam;
-}
-
-export default mongoose.model("Exam", ExamSchema);
+// Standard singleton pattern for Next.js hot reloading
+const ExamModel = mongoose.models.Exam || mongoose.model("Exam", ExamSchema);
+export default ExamModel;

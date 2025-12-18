@@ -25,4 +25,5 @@ const ClassSchema = new mongoose.Schema(
 // Compound index to ensure unique class-division pairs
 ClassSchema.index({ name: 1, division: 1 }, { unique: true });
 
-export default mongoose.models.Class || mongoose.model("Class", ClassSchema);
+const ClassModel = mongoose.models.Class || mongoose.model("Class", ClassSchema);
+export default ClassModel;
