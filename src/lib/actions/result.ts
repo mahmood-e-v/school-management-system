@@ -127,6 +127,8 @@ export async function saveExamMarks(examId: string, classId: string, formData: F
         if (!studentDataStr) return { error: "No student data" };
         const studentIds = JSON.parse(studentDataStr);
 
+        const bulkOps = [];
+
         for (const studentId of studentIds) {
             const studentMarks = [];
             for (const subject of subjects) {
@@ -138,7 +140,7 @@ export async function saveExamMarks(examId: string, classId: string, formData: F
                         subject: subject.name,
                         obtained: Number(val),
                         total: subject.totalMarks,
-                        remarks: subRemark as string
+                        remarks: String(subRemark || "")
                     });
                 }
             }
@@ -146,22 +148,31 @@ export async function saveExamMarks(examId: string, classId: string, formData: F
             const classTeacherRemark = formData.get(`classRemark-${studentId}`) as string;
 
             if (studentMarks.length > 0 || classTeacherRemark) {
-                await ResultModel.findOneAndUpdate(
-                    { examId, studentId },
-                    {
-                        marks: studentMarks,
-                        classTeacherRemark
-                    },
-                    { upsert: true, new: true }
-                );
+                bulkOps.push({
+                    updateOne: {
+                        filter: { examId, studentId },
+                        update: {
+                            $set: {
+                                marks: studentMarks,
+                                classTeacherRemark
+                            }
+                        },
+                        upsert: true
+                    }
+                });
             }
+        }
+
+        if (bulkOps.length > 0) {
+            const bulkResult = await ResultModel.bulkWrite(bulkOps);
+            console.log(`Bulk save: ${bulkResult.upsertedCount} inserted, ${bulkResult.modifiedCount} modified.`);
         }
 
         revalidatePath(`/dashboard/exams/${examId}/marks`);
         return { success: true };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Failed to save marks:", error);
-        return { error: "Failed to save marks" };
+        return { error: `Failed to save marks: ${error.message || "Unknown error"}` };
     }
 }

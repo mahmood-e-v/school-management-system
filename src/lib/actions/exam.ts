@@ -82,6 +82,57 @@ export async function createExam(formData: FormData) {
     }
 }
 
+export async function updateExam(examId: string, formData: FormData) {
+    try {
+        await dbConnect();
+        const name = formData.get("name") as string;
+        const academicYear = formData.get("academicYear") as string;
+        const startDate = formData.get("startDate") as string;
+        const endDate = formData.get("endDate") as string;
+
+        const gradeAssignmentsJson = formData.get("gradeAssignments") as string;
+        const gradeAssignments = JSON.parse(gradeAssignmentsJson || "[]");
+
+        if (!name || !academicYear || !startDate || gradeAssignments.length === 0) {
+            return { error: "Missing required fields" };
+        }
+
+        const allClasses = await ClassModel.find({});
+        const finalClasses: any[] = [];
+
+        for (const ga of gradeAssignments) {
+            const matchingClasses = allClasses.filter(c => c.name === ga.gradeName);
+            if (matchingClasses.length === 0) continue;
+
+            matchingClasses.forEach(cls => {
+                finalClasses.push({
+                    classId: cls._id,
+                    subjects: ga.subjects
+                });
+            });
+        }
+
+        if (finalClasses.length === 0) {
+            return { error: "Could not find any matching classes for the selected grades." };
+        }
+
+        await ExamModel.findByIdAndUpdate(examId, {
+            name,
+            academicYear,
+            startDate: new Date(startDate),
+            endDate: endDate ? new Date(endDate) : undefined,
+            classes: finalClasses,
+        });
+
+        revalidatePath("/dashboard/exams");
+        return { success: true };
+
+    } catch (error) {
+        console.error("Failed to update exam:", error);
+        return { error: "Failed to update exam" };
+    }
+}
+
 export async function deleteExam(examId: string) {
     try {
         await dbConnect();

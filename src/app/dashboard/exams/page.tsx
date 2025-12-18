@@ -11,6 +11,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { DeleteExamButton } from "@/components/exams/delete-exam-button";
+import { EditExamDialog } from "@/components/exams/edit-exam-dialog";
 import { BackButton, HomeButton } from "@/components/ui/nav-buttons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -88,6 +89,7 @@ export default async function ExamsPage() {
                                                 <a href={`/dashboard/exams/${exam._id}/marks`} className="text-blue-600 hover:underline text-sm font-medium">
                                                     Enter Marks
                                                 </a>
+                                                <EditExamDialog exam={exam} classes={classes} />
                                                 <DeleteExamButton examId={exam._id} examName={exam.name} />
                                             </div>
                                         </TableCell>
