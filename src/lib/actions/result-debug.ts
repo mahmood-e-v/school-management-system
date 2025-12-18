@@ -149,8 +149,9 @@ export async function getExamSheetDebug(examId: string, classId?: string): Promi
         // 6. Return Clean Object
         return { exam: safeExam, sheet };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Failed to fetch exam sheet:", error);
-        return { error: "Failed to load data" };
+        // RETURN ACTUAL ERROR FOR DEBUGGING
+        return { error: `Failed to load data: ${error.message}` };
     }
 }
