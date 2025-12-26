@@ -18,9 +18,16 @@ async function getUser(email: string) {
 }
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
-    ...authConfig,
+    pages: authConfig.pages,
+    callbacks: authConfig.callbacks,
     providers: [
         Credentials({
+            id: "credentials",
+            name: "Credentials",
+            credentials: {
+                email: { label: "Email", type: "email" },
+                password: { label: "Password", type: "password" }
+            },
             async authorize(credentials) {
                 try {
                     console.log("Authorize called with:", credentials?.email);
@@ -64,5 +71,7 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             },
         }),
     ],
-    debug: true, // Enable NextAuth debugging
+    secret: process.env.AUTH_SECRET, // Explicitly load secret
+    session: { strategy: "jwt" },
+    debug: true,
 });
