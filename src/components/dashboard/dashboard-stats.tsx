@@ -50,17 +50,17 @@ export function DashboardStats({ initialData }: DashboardStatsProps) {
     return (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Total Students Card */}
-            <Card>
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-100 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Students</CardTitle>
-                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-blue-900">Total Students</CardTitle>
+                    <Users className="h-4 w-4 text-blue-600" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{data.totalStudents}</div>
+                    <div className="text-2xl font-bold text-blue-900">{data.totalStudents}</div>
 
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="link" className="p-0 h-auto text-xs text-muted-foreground mt-1">
+                            <Button variant="link" className="p-0 h-auto text-xs text-blue-600 mt-1 hover:text-blue-800">
                                 View Class Breakdown
                             </Button>
                         </DialogTrigger>
@@ -95,19 +95,19 @@ export function DashboardStats({ initialData }: DashboardStatsProps) {
             </Card>
 
             {/* Attendance Card */}
-            <Card>
+            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 shadow-sm">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Attendance</CardTitle>
-                    <CalendarCheck className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-emerald-900">Attendance</CardTitle>
+                    <CalendarCheck className="h-4 w-4 text-emerald-600" />
                 </CardHeader>
                 <CardContent>
                     <div className="flex items-baseline justify-between">
-                        <div className="text-2xl font-bold">
+                        <div className="text-2xl font-bold text-emerald-900">
                             {loading ? "..." : `${data.attendance.percentage}%`}
                         </div>
                         <Input
                             type="date"
-                            className="h-6 w-[130px] text-xs px-2 py-0 ml-2"
+                            className="h-6 w-[130px] text-xs px-2 py-0 ml-2 border-emerald-200 bg-white/50"
                             value={attendanceDate}
                             onChange={handleDateChange}
                         />
@@ -115,7 +115,7 @@ export function DashboardStats({ initialData }: DashboardStatsProps) {
 
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="link" className="p-0 h-auto text-xs text-muted-foreground mt-1">
+                            <Button variant="link" className="p-0 h-auto text-xs text-emerald-600 mt-1 hover:text-emerald-800">
                                 View Details by Class
                             </Button>
                         </DialogTrigger>
@@ -140,7 +140,9 @@ export function DashboardStats({ initialData }: DashboardStatsProps) {
                                                 <TableCell className="font-medium">{item.className}</TableCell>
                                                 <TableCell className="text-right">{item.total}</TableCell>
                                                 <TableCell className="text-right">{item.present}</TableCell>
-                                                <TableCell className="text-right">{item.percentage}%</TableCell>
+                                                <TableCell className="text-right">
+                                                    {item.percentage === "-" ? "-" : `${item.percentage}%`}
+                                                </TableCell>
                                             </TableRow>
                                         ))
                                     ) : (
@@ -158,25 +160,25 @@ export function DashboardStats({ initialData }: DashboardStatsProps) {
             </Card>
 
             {/* Modules Links (Replaced Static Cards with functionality if needed, keeping simple) */}
-            <Card className="hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => (window.location.href = '/dashboard/classes')}>
+            <Card className="hover:bg-violet-100 transition-colors cursor-pointer bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 shadow-sm" onClick={() => (window.location.href = '/dashboard/classes')}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Class Mgmt</CardTitle>
-                    <School className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-violet-900">Class Mgmt</CardTitle>
+                    <School className="h-4 w-4 text-violet-600" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{data.classData.length}</div>
-                    <p className="text-xs text-muted-foreground">Active Classes & Divisions</p>
+                    <div className="text-2xl font-bold text-violet-900">{data.classData.length}</div>
+                    <p className="text-xs text-violet-600">Active Classes & Divisions</p>
                 </CardContent>
             </Card>
 
-            <Card className="hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => (window.location.href = '/dashboard/exams')}>
+            <Card className="hover:bg-amber-100 transition-colors cursor-pointer bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 shadow-sm" onClick={() => (window.location.href = '/dashboard/exams')}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Exams</CardTitle>
-                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                    <CardTitle className="text-sm font-medium text-amber-900">Exams</CardTitle>
+                    <BarChart3 className="h-4 w-4 text-amber-600" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-2xl font-bold">{data.totalExams || 0}</div>
-                    <p className="text-xs text-muted-foreground">Scheduled Exams</p>
+                    <div className="text-2xl font-bold text-amber-900">{data.totalExams || 0}</div>
+                    <p className="text-xs text-amber-600">Scheduled Exams</p>
                 </CardContent>
             </Card>
 

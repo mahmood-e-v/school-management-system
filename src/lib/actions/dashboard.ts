@@ -46,30 +46,48 @@ export async function getDashboardStats(dateStr?: string) {
 
         const attendanceRecords = await AttendanceModel.find({
             date: { $gte: startOfDay, $lte: endOfDay }
-        }).populate("classId", "name division");
+        }); // Removed populate because we will iterate over `classData` to get class names/details
 
-        let totalPresent = 0;
-        let totalAttendanceRecords = 0; // Total student records checked (Present + Absent)
+        let totalPresentAll = 0;
+        let totalStudentsAll = 0; // Total strength of all classes combined
 
-        // Class-wise attendance stats for this day
-        const classAttendanceStats = attendanceRecords.map((att: any) => {
-            const presentCount = att.records.filter((r: any) => r.status === "Present").length;
-            const totalRecordCount = att.records.length;
+        // Map over ALL classes to ensure we show a row for every class
+        const classAttendanceStats = classData.map((cls: any) => {
+            // Find attendance record for this class
+            const attRecord = attendanceRecords.find((r: any) => r.classId.toString() === cls._id);
 
-            totalPresent += presentCount;
-            totalAttendanceRecords += totalRecordCount;
+            const totalStudentsInClass = cls.studentCount || 0;
+            totalStudentsAll += totalStudentsInClass;
 
-            return {
-                classId: att.classId._id.toString(),
-                className: `${att.classId.name} ${att.classId.division}`,
-                present: presentCount,
-                total: totalRecordCount,
-                percentage: totalRecordCount > 0 ? ((presentCount / totalRecordCount) * 100).toFixed(1) : "0.0"
-            };
+            if (attRecord) {
+                const presentCount = attRecord.records.filter((r: any) => r.status === "Present").length;
+                totalPresentAll += presentCount;
+
+                return {
+                    classId: cls._id,
+                    className: `${cls.name} ${cls.division}`,
+                    present: presentCount,
+                    total: totalStudentsInClass,
+                    percentage: totalStudentsInClass > 0
+                        ? ((presentCount / totalStudentsInClass) * 100).toFixed(1)
+                        : "0.0"
+                };
+            } else {
+                // No attendance marked for this class
+                return {
+                    classId: cls._id,
+                    className: `${cls.name} ${cls.division}`,
+                    present: "-",
+                    total: totalStudentsInClass,
+                    percentage: "-"
+                };
+            }
         });
 
-        const overallAttendancePercentage = totalAttendanceRecords > 0
-            ? ((totalPresent / totalAttendanceRecords) * 100).toFixed(1)
+        // Overall Percentage: (Total Present across all classes / Total Students in all classes)
+        // Only count if there are students, otherwise 0
+        const overallAttendancePercentage = totalStudentsAll > 0
+            ? ((totalPresentAll / totalStudentsAll) * 100).toFixed(1)
             : "0.0";
 
         // 4. Exams count (Total)
@@ -88,6 +106,17 @@ export async function getDashboardStats(dateStr?: string) {
 
     } catch (error) {
         console.error("Failed to fetch dashboard stats:", error);
-        return { error: "Failed to load dashboard data" };
+        // Return safe default values so the UI doesn't crash
+        return {
+            totalStudents: 0,
+            classData: [],
+            attendance: {
+                date: dateStr || new Date().toISOString().split("T")[0],
+                percentage: "0.0",
+                details: []
+            },
+            totalExams: 0,
+            error: "Failed to load dashboard data. Please check database connection."
+        };
     }
 }

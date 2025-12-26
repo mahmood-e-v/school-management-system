@@ -44,62 +44,61 @@ export default async function DashboardPage() {
             <main className="p-6">
                 <DashboardStats initialData={stats} />
 
-                {/* Modules Grid */}
                 <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {/* We will populate this with links to modules later */}
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                        <h3 className="font-semibold leading-none tracking-tight">Attendance</h3>
-                        <p className="text-sm text-muted-foreground mt-2">Manage daily attendance for classes.</p>
+                    <div className="rounded-lg border bg-gradient-to-br from-emerald-50 to-teal-50 border-emerald-100 shadow-sm p-6 hover:shadow-md transition-all">
+                        <h3 className="font-semibold leading-none tracking-tight text-emerald-900">Attendance</h3>
+                        <p className="text-sm text-emerald-700 mt-2">Manage daily attendance for classes.</p>
                         <div className="mt-4">
                             <Link href="/dashboard/attendance">
-                                <Button variant="outline" className="w-full">Go to Attendance</Button>
+                                <Button variant="outline" className="w-full bg-white/50 border-emerald-200 hover:bg-emerald-100 text-emerald-900">Go to Attendance</Button>
                             </Link>
                         </div>
                     </div>
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                        <h3 className="font-semibold leading-none tracking-tight">Students</h3>
-                        <p className="text-sm text-muted-foreground mt-2">Add, edit, or upload student records.</p>
+                    <div className="rounded-lg border bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-100 shadow-sm p-6 hover:shadow-md transition-all">
+                        <h3 className="font-semibold leading-none tracking-tight text-blue-900">Students</h3>
+                        <p className="text-sm text-blue-700 mt-2">Add, edit, or upload student records.</p>
                         <div className="mt-4">
                             <Link href="/dashboard/students">
-                                <Button variant="outline" className="w-full">Manage Students</Button>
+                                <Button variant="outline" className="w-full bg-white/50 border-blue-200 hover:bg-blue-100 text-blue-900">Manage Students</Button>
                             </Link>
                         </div>
                     </div>
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                        <h3 className="font-semibold leading-none tracking-tight">Exams & Results</h3>
-                        <p className="text-sm text-muted-foreground mt-2">Schedule exams and enter marks.</p>
+                    <div className="rounded-lg border bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 shadow-sm p-6 hover:shadow-md transition-all">
+                        <h3 className="font-semibold leading-none tracking-tight text-amber-900">Exams & Results</h3>
+                        <p className="text-sm text-amber-700 mt-2">Schedule exams and enter marks.</p>
                         <div className="mt-4">
                             <Link href="/dashboard/exams">
-                                <Button variant="outline" className="w-full">View Exams</Button>
+                                <Button variant="outline" className="w-full bg-white/50 border-amber-200 hover:bg-amber-100 text-amber-900">View Exams</Button>
                             </Link>
                         </div>
                     </div>
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                        <h3 className="font-semibold leading-none tracking-tight">Reports</h3>
-                        <p className="text-sm text-muted-foreground mt-2">Generate report cards and analytics.</p>
+                    <div className="rounded-lg border bg-gradient-to-br from-purple-50 to-pink-50 border-purple-100 shadow-sm p-6 hover:shadow-md transition-all">
+                        <h3 className="font-semibold leading-none tracking-tight text-purple-900">Reports</h3>
+                        <p className="text-sm text-purple-700 mt-2">Generate report cards and analytics.</p>
                         <div className="mt-4">
                             <Link href="/dashboard/reports/report-cards">
-                                <Button variant="outline" className="w-full">View Reports</Button>
+                                <Button variant="outline" className="w-full bg-white/50 border-purple-200 hover:bg-purple-100 text-purple-900">View Reports</Button>
                             </Link>
                         </div>
                     </div>
                     {session?.user?.role === "admin" && (
                         <>
-                            <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                                <h3 className="font-semibold leading-none tracking-tight">Class Management</h3>
-                                <p className="text-sm text-muted-foreground mt-2">Create and manage classes & divisions.</p>
+                            <div className="rounded-lg border bg-gradient-to-br from-violet-50 to-purple-50 border-violet-100 shadow-sm p-6 hover:shadow-md transition-all">
+                                <h3 className="font-semibold leading-none tracking-tight text-violet-900">Class Management</h3>
+                                <p className="text-sm text-violet-700 mt-2">Create and manage classes & divisions.</p>
                                 <div className="mt-4">
                                     <Link href="/dashboard/classes">
-                                        <Button variant="outline" className="w-full">Manage Classes</Button>
+                                        <Button variant="outline" className="w-full bg-white/50 border-violet-200 hover:bg-violet-100 text-violet-900">Manage Classes</Button>
                                     </Link>
                                 </div>
                             </div>
-                            <div className="rounded-lg border bg-card text-card-foreground shadow-sm p-6">
-                                <h3 className="font-semibold leading-none tracking-tight">Teachers</h3>
-                                <p className="text-sm text-muted-foreground mt-2">Create logins for teaching staff.</p>
+                            <div className="rounded-lg border bg-gradient-to-br from-rose-50 to-red-50 border-rose-100 shadow-sm p-6 hover:shadow-md transition-all">
+                                <h3 className="font-semibold leading-none tracking-tight text-rose-900">Teachers</h3>
+                                <p className="text-sm text-rose-700 mt-2">Create logins for teaching staff.</p>
                                 <div className="mt-4">
                                     <Link href="/dashboard/teachers">
-                                        <Button variant="outline" className="w-full">Manage Staff</Button>
+                                        <Button variant="outline" className="w-full bg-white/50 border-rose-200 hover:bg-rose-100 text-rose-900">Manage Staff</Button>
                                     </Link>
                                 </div>
                             </div>

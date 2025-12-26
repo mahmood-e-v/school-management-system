@@ -38,6 +38,16 @@ async function dbConnect() {
         cached.conn = await cached.promise;
     } catch (e) {
         cached.promise = null;
+
+        // Attempt to fetch and log the current public IP to help the user debugging
+        try {
+            const res = await fetch('https://api.ipify.org?format=json');
+            const data = await res.json() as { ip: string };
+            console.error(`\n❌ MONGODB CONNECTION ERROR\n--------------------------\nCould not connect to MongoDB. This is likely due to your IP address not being whitelisted.\n\n👉 Your CURRENT PUBLIC IP is: ${data.ip}\n\n👉 Please add this IP to your MongoDB Atlas whitelist here:\n   https://cloud.mongodb.com/v2#/security/network/accessList\n--------------------------\n`);
+        } catch (err) {
+            console.error("\n❌ MONGODB CONNECTION ERROR: Could not connect to MongoDB, and failed to retrieve public IP.", err);
+        }
+
         throw e;
     }
 
