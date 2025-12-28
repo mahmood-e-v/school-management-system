@@ -8,6 +8,7 @@ import { Mail, ShieldCheck } from "lucide-react";
 
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
 export default async function TeachersPage() {
     const session = await auth();
@@ -20,6 +21,7 @@ export default async function TeachersPage() {
 
     return (
         <div className="p-6">
+            <DashboardNavButtons />
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold">Manage Teachers</h1>

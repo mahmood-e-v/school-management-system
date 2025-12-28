@@ -5,6 +5,7 @@ import { StudentsTable } from "@/components/students/students-table";
 import { ManageStudentDialog } from "@/components/students/manage-student-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/auth";
+import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
 export default async function StudentsPage() {
     const students = await getStudents();
@@ -14,6 +15,7 @@ export default async function StudentsPage() {
 
     return (
         <div className="p-6 space-y-6">
+            <DashboardNavButtons />
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold">Manage Students</h1>

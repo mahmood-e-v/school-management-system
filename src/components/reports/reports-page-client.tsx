@@ -8,6 +8,7 @@ import { ReportCard } from "@/components/reports/report-card";
 import { BroadsheetView } from "@/components/reports/broadsheet-view";
 import { Loader2, Printer, FileSpreadsheet, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
 export default function ReportsPage({ classes, schoolSettings }: { classes: any[], schoolSettings: any }) {
     const [selectedClass, setSelectedClass] = useState("");
@@ -55,6 +56,9 @@ export default function ReportsPage({ classes, schoolSettings }: { classes: any[
 
     return (
         <div className="p-6">
+            <div className="print:hidden">
+                <DashboardNavButtons />
+            </div>
             <div className="mb-8 space-y-4">
                 <h1 className="text-2xl font-bold print:hidden">Exam Reports</h1>
 

@@ -3,6 +3,7 @@ import { AttendanceForm } from "@/components/attendance/attendance-form";
 import { AttendanceReports } from "@/components/attendance/attendance-reports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/auth";
+import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
 export default async function AttendancePage() {
     const classes = await getClasses();
@@ -11,6 +12,7 @@ export default async function AttendancePage() {
 
     return (
         <div className="p-6 space-y-6">
+            <DashboardNavButtons />
             <h1 className="text-2xl font-bold">Attendance Management</h1>
 
             <Tabs defaultValue={canTakeAttendance ? "mark" : "reports"}>

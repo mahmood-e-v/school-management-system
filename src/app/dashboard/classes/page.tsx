@@ -7,6 +7,7 @@ import { DeleteClassButton } from "@/components/classes/delete-class-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, School } from "lucide-react";
 import { auth } from "@/auth";
+import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
 export default async function ClassesPage() {
     const classes = await getClasses();
@@ -16,6 +17,7 @@ export default async function ClassesPage() {
 
     return (
         <div className="p-6">
+            <DashboardNavButtons />
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h1 className="text-2xl font-bold">Manage Classes</h1>
