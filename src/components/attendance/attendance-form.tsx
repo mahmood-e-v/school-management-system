@@ -203,22 +203,24 @@ export function AttendanceForm({ classes }: { classes: ClassType[] }) {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            <Select
-                                                name={`remark-${student._id}`}
-                                                value={student.remark || ""}
-                                                onValueChange={(value) => handleRemarkChange(student._id, value)}
-                                            >
-                                                <SelectTrigger className="w-[180px]">
-                                                    <SelectValue placeholder="Select Reason" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="Sick">Sick</SelectItem>
-                                                    <SelectItem value="Long Leave">Long Leave</SelectItem>
-                                                    <SelectItem value="Excused Absence">Excused Absence</SelectItem>
-                                                    <SelectItem value="Family Function">Family Function</SelectItem>
-                                                    <SelectItem value="Other">Other</SelectItem>
-                                                </SelectContent>
-                                            </Select>
+                                            {student.status !== "Present" && (
+                                                <Select
+                                                    name={`remark-${student._id}`}
+                                                    value={student.remark || ""}
+                                                    onValueChange={(value) => handleRemarkChange(student._id, value)}
+                                                >
+                                                    <SelectTrigger className="w-[180px]">
+                                                        <SelectValue placeholder="Select Reason" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Sick">Sick</SelectItem>
+                                                        <SelectItem value="Long Leave">Long Leave</SelectItem>
+                                                        <SelectItem value="Excused Absence">Excused Absence</SelectItem>
+                                                        <SelectItem value="Family Function">Family Function</SelectItem>
+                                                        <SelectItem value="Other">Other</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}
