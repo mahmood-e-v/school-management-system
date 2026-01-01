@@ -42,7 +42,11 @@ export function ManageStudentDialog({ mode, student, classId: preSelectedClassId
         setLoading(true);
         const formData = new FormData(event.currentTarget);
 
-        // Ensure classId is explicitly sent if selected, otherwise rely on existing or preselected
+        // Ensure classId is explicitly sent using the state value.
+        // We delete any existing 'classId' captured by the form (e.g. from hidden inputs) to avoid duplicates or stale values,
+        // then append the correct value from our state.
+        formData.delete("classId");
+
         const finalClassId = selectedClassId || preSelectedClassId;
         if (finalClassId) {
             formData.append("classId", finalClassId);
