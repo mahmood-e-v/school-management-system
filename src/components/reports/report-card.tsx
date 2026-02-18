@@ -98,7 +98,7 @@ export function ReportCard({ data, schoolInfo }: ReportCardProps) {
                 </div>
                 <div className="text-center">
                     <div className="border-t border-black w-40"></div>
-                    <p className="mt-1 font-bold">Principal</p>
+                    <p className="mt-1 font-bold">Sadar Muallim</p>
                 </div>
                 <div className="text-center">
                     <div className="border-t border-black w-40"></div>
