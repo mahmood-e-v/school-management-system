@@ -10,7 +10,7 @@ import { Loader2, Printer, FileSpreadsheet, FileText, CalendarDays } from "lucid
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
-export default function ReportsPage({ classes, schoolSettings }: { classes: any[], schoolSettings: any }) {
+export default function ReportsPage({ classes, schoolSettings, activeYear }: { classes: any[], schoolSettings: any, activeYear?: string }) {
     const [selectedClass, setSelectedClass] = useState("");
     const [selectedExam, setSelectedExam] = useState("");
     const [exams, setExams] = useState<any[]>([]);
@@ -88,7 +88,7 @@ export default function ReportsPage({ classes, schoolSettings }: { classes: any[
                         </span>
                         <CalendarDays className="h-4 w-4" />
                         <span className="hidden sm:inline">Academic Year:</span>
-                        <span>{schoolSettings?.currentAcademicYear || "N/A"}</span>
+                        <span>{activeYear || schoolSettings?.currentAcademicYear || "N/A"}</span>
                     </div>
                 </div>
 

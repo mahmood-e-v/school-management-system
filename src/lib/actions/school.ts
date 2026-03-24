@@ -120,15 +120,19 @@ export async function updateSchoolSettings(data: {
 export async function getActiveAcademicYear(): Promise<string> {
     const cookieStore = await cookies();
     const selectedYear = cookieStore.get("selectedAcademicYear")?.value;
-    if (selectedYear) return selectedYear;
     
-    const settings = await getSchoolSettings();
-    return settings?.currentAcademicYear || "2025-26";
+    let rawYear = selectedYear;
+    if (!rawYear) {
+        const settings = await getSchoolSettings();
+        rawYear = settings?.currentAcademicYear || "2025-26";
+    }
+    return String(rawYear).replace(/\s+/g, '').replace(/-20(\d{2})$/, '-$1');
 }
 
 export async function setSelectedAcademicYear(year: string) {
     const cookieStore = await cookies();
-    cookieStore.set("selectedAcademicYear", year, {
+    const cleanYear = year.replace(/\s+/g, '').replace(/-20(\d{2})$/, '-$1');
+    cookieStore.set("selectedAcademicYear", cleanYear, {
         path: "/",
         maxAge: 60 * 60 * 24 * 365, // 1 year
     });
@@ -144,9 +148,15 @@ export async function getAvailableAcademicYears(): Promise<string[]> {
         const attYears = await AttendanceModel.distinct("academicYear");
         const examYears = await ExamModel.distinct("academicYear");
         
-        const years = new Set<string>([...attYears, ...examYears, active]);
+        const rawYears = [...attYears, ...examYears, active];
+        const normalizedYears = rawYears.filter(Boolean).map(y => {
+            return String(y).replace(/\s+/g, '').replace(/-20(\d{2})$/, '-$1');
+        });
         
-        const activeStart = parseInt(active.split("-")[0]);
+        const years = new Set<string>(normalizedYears);
+        
+        const activeClean = String(active).replace(/\s+/g, '').replace(/-20(\d{2})$/, '-$1');
+        const activeStart = parseInt(activeClean.split("-")[0]);
         if (!isNaN(activeStart)) {
             years.add(`${activeStart-1}-${((activeStart)%100).toString().padStart(2, '0')}`);
             years.add(`${activeStart+1}-${((activeStart+2)%100).toString().padStart(2, '0')}`);
