@@ -1,5 +1,6 @@
 import { getExams } from "@/lib/actions/exam";
 import { getClasses } from "@/lib/actions/class";
+import { getSchoolSettings } from "@/lib/actions/school";
 import { CreateExamWrapper } from "@/components/exams/create-exam-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,10 +17,16 @@ import { BackButton, HomeButton } from "@/components/ui/nav-buttons";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+import { AcademicYearBadge } from "@/components/ui/academic-year-badge";
+
+import { auth } from "@/auth";
 
 export default async function ExamsPage() {
     const exams = await getExams();
     const classes = await getClasses();
+    const settings = await getSchoolSettings();
+    const session = await auth();
+    const isAdmin = session?.user?.role === "admin";
 
     return (
         <div className="p-6">
@@ -27,16 +34,23 @@ export default async function ExamsPage() {
                 <div className="flex items-center gap-4">
                     <BackButton />
                     <HomeButton />
-                    <h1 className="text-2xl font-bold">Manage Exams</h1>
+                    <div className="flex items-center">
+                        <h1 className="text-2xl font-bold">Manage Exams</h1>
+                        <AcademicYearBadge />
+                    </div>
                 </div>
                 <div className="flex gap-2">
-                    <Link href="/dashboard/exams/settings">
-                        <Button variant="outline" className="gap-2">
-                            <Settings className="h-4 w-4" />
-                            Settings
-                        </Button>
-                    </Link>
-                    <CreateExamWrapper classes={classes} />
+                    {isAdmin && (
+                        <>
+                            <Link href="/dashboard/exams/settings">
+                                <Button variant="outline" className="gap-2">
+                                    <Settings className="h-4 w-4" />
+                                    Settings
+                                </Button>
+                            </Link>
+                            <CreateExamWrapper classes={classes} currentAcademicYear={settings.currentAcademicYear} />
+                        </>
+                    )}
                 </div>
             </div>
 
@@ -89,8 +103,12 @@ export default async function ExamsPage() {
                                                 <a href={`/dashboard/exams/${exam._id}/marks`} className="text-blue-600 hover:underline text-sm font-medium">
                                                     Enter Marks
                                                 </a>
-                                                <EditExamDialog exam={exam} classes={classes} />
-                                                <DeleteExamButton examId={exam._id} examName={exam.name} />
+                                                {isAdmin && (
+                                                    <>
+                                                        <EditExamDialog exam={exam} classes={classes} />
+                                                        <DeleteExamButton examId={exam._id} examName={exam.name} />
+                                                    </>
+                                                )}
                                             </div>
                                         </TableCell>
                                     </TableRow>

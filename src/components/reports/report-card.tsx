@@ -6,6 +6,10 @@ interface ReportCardProps {
         name: string;
         address: string;
         logo: string; // URL
+        classTeacherName?: string;
+        classTeacherSignature?: string;
+        sadarMuallimName?: string;
+        sadarMuallimSignature?: string;
     };
 }
 
@@ -15,7 +19,13 @@ export function ReportCard({ data, schoolInfo }: ReportCardProps) {
     return (
         <div className="w-[210mm] min-h-[297mm] bg-white text-black p-8 mx-auto border border-gray-200 shadow-sm print:shadow-none print:border-none mb-8 page-break-after-always">
             {/* Header */}
-            <div className="text-center border-b-2 border-black pb-4 mb-6">
+            <div className="relative text-center border-b-2 border-black pb-4 mb-6">
+                {schoolInfo.logo && (
+                    <div className="absolute left-0 top-0 h-16 w-16 md:h-20 md:w-20 lg:h-24 lg:w-24">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={schoolInfo.logo} alt="School Logo" className="h-full w-full object-contain" />
+                    </div>
+                )}
                 <h1 className="text-3xl font-bold uppercase tracking-wide">{schoolInfo.name}</h1>
                 <p className="text-sm mt-1">{schoolInfo.address}</p>
                 <div className="mt-4 flex justify-between items-end">
@@ -49,7 +59,9 @@ export function ReportCard({ data, schoolInfo }: ReportCardProps) {
                         <tr key={idx}>
                             <td className="border border-black p-2 font-medium">{sub.subject}</td>
                             <td className="border border-black p-2 text-center">{sub.total}</td>
-                            <td className="border border-black p-2 text-center">{sub.obtained}</td>
+                            <td className={`border border-black p-2 text-center ${sub.isFail ? 'text-red-600 underline decoration-black decoration-2' : ''}`}>
+                                {sub.obtained}
+                            </td>
                             <td className="border border-black p-2 text-center font-bold">{sub.grade}</td>
                             <td className="border border-black p-2 text-xs italic">{sub.remarks}</td>
                         </tr>
@@ -90,19 +102,55 @@ export function ReportCard({ data, schoolInfo }: ReportCardProps) {
                 </div>
             </div>
 
+            {/* Grading Table */}
+            {data.gradingTable && data.gradingTable.length > 0 && (
+                <div className="mb-4">
+                    <h3 className="font-bold border-b border-black pb-1 mb-2 text-sm">Grading System</h3>
+                    <table className="w-full border-collapse border border-black text-xs text-center">
+                        <tbody>
+                            <tr className="bg-gray-100 font-bold">
+                                {data.gradingTable.map((g: any, idx: number) => (
+                                    <td key={`name-${idx}`} className="border border-black p-1">{g.name}</td>
+                                ))}
+                            </tr>
+                            <tr>
+                                {data.gradingTable.map((g: any, idx: number) => (
+                                    <td key={`range-${idx}`} className="border border-black p-1">{g.minPercentage}% - {g.maxPercentage}%</td>
+                                ))}
+                            </tr>
+                            <tr>
+                                {data.gradingTable.map((g: any, idx: number) => (
+                                    <td key={`desc-${idx}`} className="border border-black p-1">{g.description}</td>
+                                ))}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            )}
+
             {/* Signatures */}
-            <div className="mt-16 flex justify-between px-8">
-                <div className="text-center">
+            <div className="mt-8 flex justify-between px-8">
+                <div className="text-center flex flex-col items-center justify-end h-20">
+                    {schoolInfo.classTeacherSignature && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={schoolInfo.classTeacherSignature} alt="Class Teacher Signature" className="h-10 object-contain mb-1" />
+                    )}
                     <div className="border-t border-black w-40"></div>
-                    <p className="mt-1 font-bold">Class Teacher</p>
+                    <p className="mt-1 font-bold text-sm">Class Teacher</p>
+                    {schoolInfo.classTeacherName && <p className="text-xs">{schoolInfo.classTeacherName}</p>}
                 </div>
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center justify-end h-20">
+                    {schoolInfo.sadarMuallimSignature && (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img src={schoolInfo.sadarMuallimSignature} alt="Sadar Muallim Signature" className="h-10 object-contain mb-1" />
+                    )}
                     <div className="border-t border-black w-40"></div>
-                    <p className="mt-1 font-bold">Sadar Muallim</p>
+                    <p className="mt-1 font-bold text-sm">Sadar Muallim</p>
+                    {schoolInfo.sadarMuallimName && <p className="text-xs">{schoolInfo.sadarMuallimName}</p>}
                 </div>
-                <div className="text-center">
+                <div className="text-center flex flex-col items-center justify-end h-20">
                     <div className="border-t border-black w-40"></div>
-                    <p className="mt-1 font-bold">Parent</p>
+                    <p className="mt-1 font-bold text-sm">Parent</p>
                 </div>
             </div>
 

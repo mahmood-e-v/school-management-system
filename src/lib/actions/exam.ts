@@ -3,13 +3,17 @@
 import dbConnect from "@/lib/db";
 import ExamModel from "@/models/Exam";
 import ClassModel from "@/models/Class";
+import { getSchoolSettings, getActiveAcademicYear } from "@/lib/actions/school";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
 
 export async function getExams() {
     try {
         await dbConnect();
+        const academicYear = await getActiveAcademicYear();
+
         // Populate nested classId inside classes array
-        const exams = await ExamModel.find({})
+        const exams = await ExamModel.find({ academicYear })
             .populate("classes.classId", "name division")
             .sort({ startDate: -1 });
         return JSON.parse(JSON.stringify(exams));
@@ -23,6 +27,11 @@ import ResultModel from "@/models/Result";
 
 export async function createExam(formData: FormData) {
     try {
+        const session = await auth();
+        if (session?.user?.role !== "admin") {
+            return { error: "Unauthorized: Only administrators can create exams." };
+        }
+
         await dbConnect();
         const name = formData.get("name") as string;
         const academicYear = formData.get("academicYear") as string;
@@ -38,8 +47,8 @@ export async function createExam(formData: FormData) {
             return { error: "Missing required fields" };
         }
 
-        // Fetch all classes to map gradeNames to individual classIds
-        const allClasses = await ClassModel.find({});
+        // Fetch all classes for the target academic year to map gradeNames to individual classIds
+        const allClasses = await ClassModel.find({ academicYear });
 
         const finalClasses: any[] = [];
 
@@ -84,6 +93,11 @@ export async function createExam(formData: FormData) {
 
 export async function updateExam(examId: string, formData: FormData) {
     try {
+        const session = await auth();
+        if (session?.user?.role !== "admin") {
+            return { error: "Unauthorized: Only administrators can update exams." };
+        }
+
         await dbConnect();
         const name = formData.get("name") as string;
         const academicYear = formData.get("academicYear") as string;
@@ -97,7 +111,7 @@ export async function updateExam(examId: string, formData: FormData) {
             return { error: "Missing required fields" };
         }
 
-        const allClasses = await ClassModel.find({});
+        const allClasses = await ClassModel.find({ academicYear });
         const finalClasses: any[] = [];
 
         for (const ga of gradeAssignments) {
@@ -135,6 +149,11 @@ export async function updateExam(examId: string, formData: FormData) {
 
 export async function deleteExam(examId: string) {
     try {
+        const session = await auth();
+        if (session?.user?.role !== "admin") {
+            return { error: "Unauthorized: Only administrators can delete exams." };
+        }
+
         await dbConnect();
 
         // Check for dependencies

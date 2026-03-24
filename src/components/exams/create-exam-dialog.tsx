@@ -19,14 +19,14 @@ import { toast } from "sonner";
 import { Plus, Trash2, Calendar, BookOpen, Users } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function CreateExamDialog({ classes }: { classes: any[] }) {
+export function CreateExamDialog({ classes, currentAcademicYear }: { classes: any[], currentAcademicYear: string }) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     // 1. Basic Info State
     const [basicInfo, setBasicInfo] = useState({
         name: "",
-        academicYear: new Date().getFullYear() + "-" + (new Date().getFullYear() + 1),
+        academicYear: currentAcademicYear,
         startDate: "",
         endDate: "",
     });
@@ -135,7 +135,7 @@ export function CreateExamDialog({ classes }: { classes: any[] }) {
             // Reset state
             setBasicInfo({
                 name: "",
-                academicYear: new Date().getFullYear() + "-" + (new Date().getFullYear() + 1),
+                academicYear: currentAcademicYear,
                 startDate: "",
                 endDate: ""
             });
@@ -147,7 +147,7 @@ export function CreateExamDialog({ classes }: { classes: any[] }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button shadow="sm">
+                <Button>
                     <Plus className="mr-2 h-4 w-4" /> Create Exam
                 </Button>
             </DialogTrigger>

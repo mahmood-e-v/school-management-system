@@ -3,6 +3,7 @@
 import dbConnect from "@/lib/db";
 import AttendanceModel from "@/models/Attendance";
 import StudentModel from "@/models/Student";
+import { getSchoolSettings, getActiveAcademicYear } from "@/lib/actions/school";
 import { revalidatePath } from "next/cache";
 
 export async function getAttendanceSheetData(classId: string, date: string) {
@@ -20,9 +21,12 @@ export async function getAttendanceSheetData(classId: string, date: string) {
         // 1. Fetch Students
         const students = await StudentModel.find({ classId }).sort({ rollNo: 1 });
 
+        const academicYear = await getActiveAcademicYear();
+
         // 2. Fetch Existing Attendance
         const existingAttendance = await AttendanceModel.findOne({
             classId,
+            academicYear,
             date: {
                 $gte: startOfDay,
                 $lte: endOfDay
@@ -92,8 +96,11 @@ export async function saveAttendance(formData: FormData) {
         endOfDay.setUTCHours(23, 59, 59, 999);
 
         // First try to find existing to update
+        const academicYear = await getActiveAcademicYear();
+
         let doc = await AttendanceModel.findOne({
             classId,
+            academicYear,
             date: { $gte: startOfDay, $lte: endOfDay }
         });
 
@@ -106,6 +113,7 @@ export async function saveAttendance(formData: FormData) {
             console.log("Creating new document");
             doc = await AttendanceModel.create({
                 classId,
+                academicYear,
                 date: saveDate,
                 records
             });
@@ -136,9 +144,12 @@ export async function getMonthlyAttendance(classId: string, month: number, year:
         // 1. Fetch all students in class
         const students = await StudentModel.find({ classId }).select("name rollNo").sort({ rollNo: 1 }).lean();
 
+        const academicYear = await getActiveAcademicYear();
+
         // 2. Fetch all attendance records for this class & month
         const attendanceRecords = await AttendanceModel.find({
             classId,
+            academicYear,
             date: { $gte: startOfMonth, $lte: endOfMonth }
         }).lean();
 
@@ -186,11 +197,13 @@ export async function getMonthlyAttendance(classId: string, month: number, year:
 export async function getStudentAttendance(studentId: string) {
     try {
         await dbConnect();
-        // Fetch all time attendance for this student
-        // We need to find all Attendance Docs where this student exists in 'records'
+        // Fetch all time attendance for this student ... wait, student might spans multiple years. 
+        // We should restrict student dashboard attendance to the CURRENT academic year so it's consistent.
+        const academicYear = await getActiveAcademicYear();
 
         const records = await AttendanceModel.find({
-            "records.studentId": studentId
+            "records.studentId": studentId,
+            academicYear
         }).select("date records").sort({ date: -1 }).lean();
 
         const history = records.map((doc: any) => {

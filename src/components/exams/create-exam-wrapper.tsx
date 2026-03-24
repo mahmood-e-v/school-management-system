@@ -7,6 +7,6 @@ const CreateExamDialog = dynamic(
     { ssr: false }
 );
 
-export function CreateExamWrapper({ classes }: { classes: any[] }) {
-    return <CreateExamDialog classes={classes} />;
+export function CreateExamWrapper({ classes, currentAcademicYear }: { classes: any[], currentAcademicYear: string }) {
+    return <CreateExamDialog classes={classes} currentAcademicYear={currentAcademicYear} />;
 }

@@ -9,14 +9,21 @@ interface BroadsheetViewProps {
     reportData: any;
     examName: string;
     className: string;
+    schoolSettings?: any;
 }
 
 import { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Printer } from "lucide-react";
 
-export function BroadsheetView({ reportData, examName, className }: BroadsheetViewProps) {
+export function BroadsheetView({ reportData, examName, className, schoolSettings }: BroadsheetViewProps) {
     const componentRef = useRef<HTMLDivElement>(null);
+
+    const schoolInfo = schoolSettings || {
+        name: "Madrasa Wadi Rahma",
+        address: "Falaj Haza' Al Ain",
+        logo: "https://placehold.co/80x80?text=Logo"
+    };
 
     const handlePrint = useReactToPrint({
         contentRef: componentRef,
@@ -80,10 +87,10 @@ export function BroadsheetView({ reportData, examName, className }: BroadsheetVi
             <div className="rounded-md border bg-card overflow-hidden" ref={componentRef}>
                 <div className="p-4 hidden print:block mb-4 text-center">
                     <div className="flex justify-center items-center gap-4 mb-2">
-                        <img src="https://placehold.co/80x80?text=Logo" alt="School Logo" className="h-20 w-20 object-contain" />
+                        {schoolInfo.logo && <img src={schoolInfo.logo} alt="School Logo" className="h-20 w-20 object-contain" />}
                         <div>
-                            <h1 className="text-2xl font-bold uppercase">Madrasa Wadi Rahma</h1>
-                            <p className="text-sm font-medium">Falaj Haza' Al Ain</p>
+                            <h1 className="text-2xl font-bold uppercase">{schoolInfo.name}</h1>
+                            <p className="text-sm font-medium">{schoolInfo.address}</p>
                         </div>
                     </div>
                     <h2 className="text-xl font-semibold mt-2">{examName} - Marksheet</h2>
@@ -116,7 +123,7 @@ export function BroadsheetView({ reportData, examName, className }: BroadsheetVi
                                             <TableCell key={sub} className="text-center border-l bg-accent/5">
                                                 {res ? (
                                                     <div className="flex flex-col items-center">
-                                                        <span>{res.obtained}</span>
+                                                        <span className={`${res.isFail ? 'text-red-600 underline decoration-black decoration-2' : ''}`}>{res.obtained}</span>
                                                         <span className="text-[10px] text-muted-foreground">{res.grade}</span>
                                                     </div>
                                                 ) : "-"}

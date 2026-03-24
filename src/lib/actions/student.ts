@@ -5,11 +5,22 @@ import StudentModel from "@/models/Student";
 import ClassModel from "@/models/Class";
 import * as XLSX from "xlsx";
 import { revalidatePath } from "next/cache";
+import { getActiveAcademicYear } from "./school";
 
 export async function getStudents(classId?: string) {
     try {
         await dbConnect();
-        const query = classId ? { classId } : {};
+        const activeYear = await getActiveAcademicYear();
+        
+        let query: any = {};
+        if (classId) {
+            query.classId = classId;
+        } else {
+            const activeClasses = await ClassModel.find({ academicYear: activeYear }).select('_id');
+            const classIds = activeClasses.map(c => c._id);
+            query.classId = { $in: classIds };
+        }
+
         const students = await StudentModel.find(query)
             .populate("classId", "name division")
             .sort({ "classId.name": 1, rollNo: 1 });
@@ -35,10 +46,12 @@ export async function uploadStudents(formData: FormData) {
 
         await dbConnect();
 
+        const activeYear = await getActiveAcademicYear();
+
         // Cache classes for quick lookup: Key = "Name-Division" (e.g., "Grade 10-A")
-        const classes = await ClassModel.find({});
+        const classes = await ClassModel.find({ academicYear: activeYear });
         const classMap = new Map();
-        console.log("Found classes in DB:", classes.length);
+        console.log("Found classes in DB for active year:", classes.length);
         classes.forEach((bucket) => {
             const key = `${bucket.name}-${bucket.division}`.toUpperCase();
             console.log("DB Class Key:", key);
@@ -286,3 +299,45 @@ export async function deleteStudent(id: string) {
         return { error: "Failed to delete student" };
     }
 }
+
+export async function promoteStudents(studentIds: string[], destinationClassId: string) {
+    try {
+        await dbConnect();
+
+        if (!studentIds || studentIds.length === 0 || !destinationClassId) {
+            return { error: "Missing required fields" };
+        }
+
+        const destClass = await ClassModel.findById(destinationClassId);
+        if (!destClass) {
+            return { error: "Destination class not found" };
+        }
+
+        // Note: this might throw a duplicate key error if Roll No already exists in destination.
+        // The frontend will catch the error from the server and display it via toast.
+        const students = await StudentModel.find({ _id: { $in: studentIds } }).lean();
+        
+        const newStudents = students.map((s: any) => {
+            const { _id, createdAt, updatedAt, __v, ...rest } = s;
+            return {
+                ...rest,
+                classId: destinationClassId
+            };
+        });
+
+        // insertMany will fail if Roll Number conflicts in destination class
+        await StudentModel.insertMany(newStudents);
+
+        revalidatePath("/dashboard/classes");
+        revalidatePath("/dashboard/students");
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Promote students error:", error);
+        if (error.code === 11000) {
+            return { error: "Roll Number collision in destination class. Please resolve Roll Numbers first." };
+        }
+        return { error: "Failed to promote students" };
+    }
+}
+

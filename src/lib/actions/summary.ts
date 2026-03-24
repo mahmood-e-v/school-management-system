@@ -3,6 +3,7 @@
 import dbConnect from "@/lib/db";
 import AttendanceModel from "@/models/Attendance";
 import StudentModel from "@/models/Student";
+import { getSchoolSettings, getActiveAcademicYear } from "@/lib/actions/school";
 
 export async function getAttendanceSummary(classId: string, month: number, year: number) {
     try {
@@ -15,9 +16,12 @@ export async function getAttendanceSummary(classId: string, month: number, year:
         // 2. Fetch all students in class
         const students = await StudentModel.find({ classId }).sort({ rollNo: 1 });
 
+        const academicYear = await getActiveAcademicYear();
+
         // 3. Fetch attendance records in range
         const attendanceRecords = await AttendanceModel.find({
             classId,
+            academicYear,
             date: { $gte: startDate, $lte: endDate },
         });
 

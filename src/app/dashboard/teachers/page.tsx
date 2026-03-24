@@ -9,6 +9,7 @@ import { Mail, ShieldCheck } from "lucide-react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
+import { AcademicYearBadge } from "@/components/ui/academic-year-badge";
 
 export default async function TeachersPage() {
     const session = await auth();
@@ -24,7 +25,10 @@ export default async function TeachersPage() {
             <DashboardNavButtons />
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold">Manage Teachers</h1>
+                    <div className="flex items-center">
+                        <h1 className="text-2xl font-bold">Manage Teachers</h1>
+                        <AcademicYearBadge />
+                    </div>
                     <p className="text-sm text-muted-foreground mt-1">Create accounts for staff members</p>
                 </div>
                 <div className="flex gap-2">

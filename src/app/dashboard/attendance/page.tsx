@@ -4,6 +4,7 @@ import { AttendanceReports } from "@/components/attendance/attendance-reports";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/auth";
 import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
+import { AcademicYearBadge } from "@/components/ui/academic-year-badge";
 
 export default async function AttendancePage() {
     const classes = await getClasses();
@@ -13,7 +14,10 @@ export default async function AttendancePage() {
     return (
         <div className="p-6 space-y-6">
             <DashboardNavButtons />
-            <h1 className="text-2xl font-bold">Attendance Management</h1>
+            <div className="flex items-center">
+                <h1 className="text-2xl font-bold">Attendance Management</h1>
+                <AcademicYearBadge />
+            </div>
 
             <Tabs defaultValue={canTakeAttendance ? "mark" : "reports"}>
                 <TabsList>

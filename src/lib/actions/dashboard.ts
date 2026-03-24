@@ -5,17 +5,16 @@ import StudentModel from "@/models/Student";
 import ClassModel from "@/models/Class";
 import AttendanceModel from "@/models/Attendance";
 import ExamModel from "@/models/Exam";
+import { getSchoolSettings, getActiveAcademicYear } from "@/lib/actions/school";
 
 export async function getDashboardStats(dateStr?: string) {
     try {
         await dbConnect();
 
-        // 1. Total Students
-        const totalStudents = await StudentModel.countDocuments();
+        const academicYear = await getActiveAcademicYear();
 
-        // 2. Class-wise Data (Students count, Teacher)
-        // We can use aggregation or just simple loops. Aggregation is better for counts.
-        const classes = await ClassModel.find({}).lean();
+        // 1. Class-wise Data (Students count, Teacher)
+        const classes = await ClassModel.find({ academicYear }).lean();
 
         // Count students per class
         const studentCounts = await StudentModel.aggregate([
@@ -45,6 +44,7 @@ export async function getDashboardStats(dateStr?: string) {
         const endOfDay = new Date(Date.UTC(queryDate.getUTCFullYear(), queryDate.getUTCMonth(), queryDate.getUTCDate(), 23, 59, 59));
 
         const attendanceRecords = await AttendanceModel.find({
+            academicYear,
             date: { $gte: startOfDay, $lte: endOfDay }
         }); // Removed populate because we will iterate over `classData` to get class names/details
 
@@ -91,10 +91,10 @@ export async function getDashboardStats(dateStr?: string) {
             : "0.0";
 
         // 4. Exams count (Total)
-        const totalExams = await ExamModel.countDocuments();
+        const totalExams = await ExamModel.countDocuments({ academicYear });
 
         return {
-            totalStudents,
+            totalStudents: totalStudentsAll,
             classData: classData.sort((a: any, b: any) => a.name.localeCompare(b.name)),
             attendance: {
                 date: queryDateStr,

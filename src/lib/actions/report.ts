@@ -7,12 +7,16 @@ import StudentModel from "@/models/Student";
 import ClassModel from "@/models/Class";
 import GradeModel from "@/models/Grade";
 
-export async function getClassesWithExams() {
+export async function getClassesWithExams(academicYear?: string) {
     try {
         await dbConnect();
-        // Return classes that have exams associated with them? 
-        // Or just all classes, and we filter exams later.
-        const classes = await ClassModel.find({}).sort({ name: 1, division: 1 });
+        
+        const query: any = {};
+        if (academicYear) {
+            query.academicYear = academicYear;
+        }
+
+        const classes = await ClassModel.find(query).sort({ name: 1, division: 1 });
         return JSON.parse(JSON.stringify(classes));
     } catch (error) {
         return [];
@@ -72,8 +76,10 @@ export async function generateClassReportSafe(examId: string, classId: string): 
                 const total = sub.totalMarks;
 
                 // Check for fail conditions (e.g. < 35% or custom logic if needed)
+                let isSubjectFail = false;
                 if ((obtained / total) * 100 < 35) {
                     isFailed = true;
+                    isSubjectFail = true;
                 }
 
                 totalObtained += obtained;
@@ -88,7 +94,8 @@ export async function generateClassReportSafe(examId: string, classId: string): 
                     total: Number(total),
                     percentage: percentage.toFixed(1),
                     grade: String(grade.name),
-                    remarks: String(markEntry?.remarks || "")
+                    remarks: String(markEntry?.remarks || ""),
+                    isFail: isSubjectFail
                 };
             });
 
@@ -145,6 +152,12 @@ export async function generateClassReportSafe(examId: string, classId: string): 
             examName: String(exam.name || ""),
             academicYear: String(exam.academicYear || ""),
             date: exam.startDate ? new Date(exam.startDate).toISOString() : "",
+            gradingTable: grades.map((g: any) => ({
+                name: String(g.name),
+                minPercentage: Number(g.minPercentage),
+                maxPercentage: Number(g.maxPercentage),
+                description: String(g.description || "")
+            })),
             reportData: reportData
         };
 

@@ -18,12 +18,16 @@ const ClassSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
+        academicYear: {
+            type: String,
+            required: true,
+        },
     },
     { timestamps: true }
 );
 
-// Compound index to ensure unique class-division pairs
-ClassSchema.index({ name: 1, division: 1 }, { unique: true });
+// Compound index to ensure unique class-division pairs per academic year
+ClassSchema.index({ name: 1, division: 1, academicYear: 1 }, { unique: true });
 
 const ClassModel = mongoose.models.Class || mongoose.model("Class", ClassSchema);
 export default ClassModel;

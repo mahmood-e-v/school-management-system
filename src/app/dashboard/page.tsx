@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/actions/dashboard";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
+import { AcademicYearBadge } from "@/components/ui/academic-year-badge";
 
 export default async function DashboardPage() {
     const session = await auth();
@@ -20,9 +21,12 @@ export default async function DashboardPage() {
         <div className="min-h-screen bg-gray-50/50">
             {/* Top Navigation */}
             <header className="flex h-16 items-center justify-between border-b bg-white px-6 shadow-sm">
-                <h1 className="text-xl font-bold tracking-tight text-gray-900">
-                    School Admin
-                </h1>
+                <div className="flex items-center">
+                    <h1 className="text-xl font-bold tracking-tight text-gray-900">
+                        School Admin
+                    </h1>
+                    <AcademicYearBadge />
+                </div>
                 <div className="flex items-center gap-4">
                     <span className="text-sm text-gray-600">
                         {session?.user?.email} ({session?.user?.role || "User"})
@@ -99,6 +103,15 @@ export default async function DashboardPage() {
                                 <div className="mt-4">
                                     <Link href="/dashboard/teachers">
                                         <Button variant="outline" className="w-full bg-white/50 border-rose-200 hover:bg-rose-100 text-rose-900">Manage Staff</Button>
+                                    </Link>
+                                </div>
+                            </div>
+                            <div className="rounded-lg border bg-gradient-to-br from-slate-50 to-gray-50 border-slate-200 shadow-sm p-6 hover:shadow-md transition-all">
+                                <h3 className="font-semibold leading-none tracking-tight text-slate-900">Settings</h3>
+                                <p className="text-sm text-slate-700 mt-2">Configure school profile & academic year.</p>
+                                <div className="mt-4">
+                                    <Link href="/dashboard/settings">
+                                        <Button variant="outline" className="w-full bg-white/50 border-slate-300 hover:bg-slate-200 text-slate-900">Open Settings</Button>
                                     </Link>
                                 </div>
                             </div>

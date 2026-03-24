@@ -11,6 +11,10 @@ const AttendanceSchema = new mongoose.Schema(
             ref: "Class",
             required: true,
         },
+        academicYear: {
+            type: String,
+            required: true,
+        },
         records: [
             {
                 studentId: {
@@ -30,8 +34,8 @@ const AttendanceSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Ensure one attendance record per class per day
-AttendanceSchema.index({ classId: 1, date: 1 }, { unique: true });
+// Ensure one attendance record per class per day per academicYear
+AttendanceSchema.index({ classId: 1, date: 1, academicYear: 1 }, { unique: true });
 
 export default mongoose.models.Attendance ||
     mongoose.model("Attendance", AttendanceSchema);

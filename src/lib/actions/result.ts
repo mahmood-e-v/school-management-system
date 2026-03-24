@@ -128,7 +128,7 @@ export async function saveExamMarks(examId: string, classId: string, formData: F
         if (!studentDataStr) return { error: "No student data" };
         const studentIds = JSON.parse(studentDataStr);
 
-        const bulkOps = [];
+        const bulkOps: any[] = [];
 
         for (const studentId of studentIds) {
             const studentMarks = [];

@@ -5,6 +5,7 @@ import AttendanceModel from "@/models/Attendance";
 import ExamModel from "@/models/Exam";
 import ResultModel from "@/models/Result";
 import ClassModel from "@/models/Class";
+import { getSchoolSettings, getActiveAcademicYear } from "@/lib/actions/school";
 
 export async function getAnalyticsData() {
     try {
@@ -21,9 +22,11 @@ export async function getAnalyticsData() {
             dates.push(d);
         }
 
+        const academicYear = await getActiveAcademicYear();
+
         const attendanceStats = [];
         for (const d of dates) {
-            const att = await AttendanceModel.find({ date: d });
+            const att = await AttendanceModel.find({ date: d, academicYear });
             let totalPresent = 0;
             let totalStudents = 0; // In records
             att.forEach(a => {

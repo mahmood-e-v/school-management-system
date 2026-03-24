@@ -1,4 +1,4 @@
-import { getClasses } from "@/lib/actions/class";
+import { getClasses, getAllClasses } from "@/lib/actions/class";
 import { AddClassDialog } from "@/components/classes/add-class-dialog";
 import { ViewStudentsDialog } from "@/components/classes/view-students-dialog";
 import { EditClassDialog } from "@/components/classes/edit-class-dialog";
@@ -8,9 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, School } from "lucide-react";
 import { auth } from "@/auth";
 import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
+import { PromoteStudentsDialog } from "@/components/classes/promote-students-dialog";
+import { AcademicYearBadge } from "@/components/ui/academic-year-badge";
 
 export default async function ClassesPage() {
     const classes = await getClasses();
+    const allClasses = await getAllClasses();
     const session = await auth();
     const canManageClasses = session?.user?.role === "admin" || session?.user?.permissions?.includes("manage_classes");
     const canManageStudents = session?.user?.role === "admin" || session?.user?.permissions?.includes("manage_students");
@@ -18,13 +21,17 @@ export default async function ClassesPage() {
     return (
         <div className="p-6">
             <DashboardNavButtons />
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 mt-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Manage Classes</h1>
+                    <div className="flex items-center">
+                        <h1 className="text-2xl font-bold">Manage Classes</h1>
+                        <AcademicYearBadge />
+                    </div>
                     <p className="text-sm text-muted-foreground mt-1">Create classes and view student lists</p>
                 </div>
                 {canManageClasses && (
                     <div className="flex gap-2">
+                        <PromoteStudentsDialog classes={classes} allClasses={allClasses} />
                         <UploadClassesDialog />
                         <AddClassDialog />
                     </div>

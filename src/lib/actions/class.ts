@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import dbConnect from "@/lib/db";
 import ClassModel from "@/models/Class";
 import { revalidatePath } from "next/cache";
+import { getActiveAcademicYear } from "./school";
 
 export async function uploadClasses(formData: FormData) {
     try {
@@ -19,6 +20,8 @@ export async function uploadClasses(formData: FormData) {
         const data = XLSX.utils.sheet_to_json(sheet);
 
         await dbConnect();
+
+        const activeYear = await getActiveAcademicYear();
 
         let inserted = 0;
         let updated = 0;
@@ -50,7 +53,7 @@ export async function uploadClasses(formData: FormData) {
             console.log(`Row ${rowIndex}: Checking ${cleanName}-${cleanDivision}. Teacher in Excel: '${Teacher}' -> Clean: '${cleanTeacher}'`);
 
             // Check existence
-            const existing = await ClassModel.findOne({ name: cleanName, division: cleanDivision });
+            const existing = await ClassModel.findOne({ name: cleanName, division: cleanDivision, academicYear: activeYear });
             if (existing) {
                 console.log(`Found existing class: ${existing.name}-${existing.division}. Current Teacher: '${existing.classTeacher}'`);
 
@@ -76,7 +79,8 @@ export async function uploadClasses(formData: FormData) {
             await ClassModel.create({
                 name: cleanName,
                 division: cleanDivision,
-                classTeacher: cleanTeacher
+                classTeacher: cleanTeacher,
+                academicYear: activeYear,
             });
             inserted++;
         }
@@ -106,7 +110,9 @@ export async function createClass(formData: FormData) {
             return { error: "Name and Division are required" };
         }
 
-        const existingClass = await ClassModel.findOne({ name, division });
+        const activeYear = await getActiveAcademicYear();
+
+        const existingClass = await ClassModel.findOne({ name, division, academicYear: activeYear });
         if (existingClass) {
             return { error: "Class already exists" };
         }
@@ -115,6 +121,7 @@ export async function createClass(formData: FormData) {
             name,
             division,
             classTeacher: classTeacher || "Not Assigned",
+            academicYear: activeYear,
         });
         revalidatePath("/dashboard/classes");
         return { success: true };
@@ -167,7 +174,8 @@ import StudentModel from "@/models/Student";
 export async function getClasses() {
     try {
         await dbConnect();
-        const classes = await ClassModel.find({}).sort({ name: 1, division: 1 }).lean();
+        const activeYear = await getActiveAcademicYear();
+        const classes = await ClassModel.find({ academicYear: activeYear }).sort({ name: 1, division: 1 }).lean();
 
         // Get student counts for all classes
         const studentCounts = await StudentModel.aggregate([
@@ -187,6 +195,17 @@ export async function getClasses() {
         return data;
     } catch (error) {
         console.error("Failed to fetch classes:", error);
+        return [];
+    }
+}
+
+export async function getAllClasses() {
+    try {
+        await dbConnect();
+        const classes = await ClassModel.find({}).sort({ academicYear: -1, name: 1, division: 1 }).lean();
+        return JSON.parse(JSON.stringify(classes));
+    } catch (error) {
+        console.error("Failed to fetch all classes:", error);
         return [];
     }
 }

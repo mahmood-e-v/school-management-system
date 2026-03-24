@@ -6,6 +6,7 @@ import { ManageStudentDialog } from "@/components/students/manage-student-dialog
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { auth } from "@/auth";
 import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
+import { AcademicYearBadge } from "@/components/ui/academic-year-badge";
 
 export default async function StudentsPage() {
     const students = await getStudents();
@@ -16,10 +17,13 @@ export default async function StudentsPage() {
     return (
         <div className="p-6 space-y-6">
             <DashboardNavButtons />
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Manage Students</h1>
-                    <p className="text-sm text-muted-foreground">View and manage all students across classes</p>
+                    <div className="flex items-center">
+                        <h1 className="text-2xl font-bold">Manage Students</h1>
+                        <AcademicYearBadge />
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">View and manage all students across classes</p>
                 </div>
                 <div className="flex gap-2">
                     {canManage && <ManageStudentDialog mode="add" classes={classes} />}

@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { generateClassReportSafe, getExamsForClass } from "@/lib/actions/report";
 import { ReportCard } from "@/components/reports/report-card";
 import { BroadsheetView } from "@/components/reports/broadsheet-view";
-import { Loader2, Printer, FileSpreadsheet, FileText } from "lucide-react";
+import { Loader2, Printer, FileSpreadsheet, FileText, CalendarDays } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardNavButtons } from "@/components/common/dashboard-nav-buttons";
 
@@ -51,8 +51,27 @@ export default function ReportsPage({ classes, schoolSettings }: { classes: any[
         logo: "https://placehold.co/80x80?text=Logo"
     };
 
-    // Find class name for report
-    const className = classes.find(c => c._id === selectedClass)?.name + " " + classes.find(c => c._id === selectedClass)?.division;
+    // Find class info for report
+    const selectedClassObject = classes.find(c => c._id === selectedClass);
+    const className = selectedClassObject ? `${selectedClassObject.name} ${selectedClassObject.division}` : "";
+    
+    // Determine the class teacher and signature dynamically based on the class
+    const classTeacherName = selectedClassObject?.classTeacher || "";
+    
+    // Robust Matching: Trim and ignore case
+    const teacherSignatureObj = schoolSettings?.classTeacherSignatures?.find((t: any) => {
+        if (!t.teacherName || !classTeacherName) return false;
+        return t.teacherName.trim().toLowerCase() === classTeacherName.trim().toLowerCase();
+    });
+    
+    const resolvedClassTeacherSignature = teacherSignatureObj?.signature || schoolSettings?.classTeacherSignature || "";
+
+    const activeSchoolInfo = {
+        ...schoolInfo,
+        classTeacherName,
+        classTeacherSignature: resolvedClassTeacherSignature,
+        sadarMuallimName: schoolSettings?.sadarMuallimName || ""
+    };
 
     return (
         <div className="p-6">
@@ -60,7 +79,18 @@ export default function ReportsPage({ classes, schoolSettings }: { classes: any[
                 <DashboardNavButtons />
             </div>
             <div className="mb-8 space-y-4">
-                <h1 className="text-2xl font-bold print:hidden">Exam Reports</h1>
+                <div className="flex items-center print:hidden">
+                    <h1 className="text-2xl font-bold">Exam Reports</h1>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-semibold rounded-full border border-blue-200 shadow-sm ml-4">
+                        <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                        </span>
+                        <CalendarDays className="h-4 w-4" />
+                        <span className="hidden sm:inline">Academic Year:</span>
+                        <span>{schoolSettings?.currentAcademicYear || "N/A"}</span>
+                    </div>
+                </div>
 
                 {/* Controls */}
                 {/* Controls */}
@@ -127,9 +157,10 @@ export default function ReportsPage({ classes, schoolSettings }: { classes: any[
                                             ...studentReport,
                                             student: { ...studentReport.student, class: className },
                                             examName: reportData.examName,
-                                            academicYear: reportData.academicYear
+                                            academicYear: reportData.academicYear,
+                                            gradingTable: reportData.gradingTable
                                         }}
-                                        schoolInfo={schoolInfo}
+                                        schoolInfo={activeSchoolInfo}
                                     />
                                 ))}
                             </div>
@@ -140,6 +171,7 @@ export default function ReportsPage({ classes, schoolSettings }: { classes: any[
                                 reportData={reportData.reportData}
                                 examName={reportData.examName}
                                 className={className}
+                                schoolSettings={schoolSettings}
                             />
                         </TabsContent>
                     </Tabs>
