@@ -34,7 +34,8 @@ export async function createExam(formData: FormData) {
 
         await dbConnect();
         const name = formData.get("name") as string;
-        const academicYear = formData.get("academicYear") as string;
+        const rawAcademicYear = formData.get("academicYear") as string;
+        const academicYear = rawAcademicYear ? String(rawAcademicYear).replace(/\s+/g, '').replace(/-20(\d{2})$/, '-$1') : "";
         const startDate = formData.get("startDate") as string;
         const endDate = formData.get("endDate") as string;
 
@@ -53,7 +54,9 @@ export async function createExam(formData: FormData) {
         const finalClasses: any[] = [];
 
         for (const ga of gradeAssignments) {
-            const matchingClasses = allClasses.filter(c => c.name === ga.gradeName);
+            const matchingClasses = allClasses.filter(c => 
+                c.name && ga.gradeName && c.name.trim().toLowerCase() === ga.gradeName.trim().toLowerCase()
+            );
 
             if (matchingClasses.length === 0) {
                 console.warn(`No classes found for grade: ${ga.gradeName}`);
@@ -100,7 +103,8 @@ export async function updateExam(examId: string, formData: FormData) {
 
         await dbConnect();
         const name = formData.get("name") as string;
-        const academicYear = formData.get("academicYear") as string;
+        const rawAcademicYear = formData.get("academicYear") as string;
+        const academicYear = rawAcademicYear ? String(rawAcademicYear).replace(/\s+/g, '').replace(/-20(\d{2})$/, '-$1') : "";
         const startDate = formData.get("startDate") as string;
         const endDate = formData.get("endDate") as string;
 
@@ -115,7 +119,9 @@ export async function updateExam(examId: string, formData: FormData) {
         const finalClasses: any[] = [];
 
         for (const ga of gradeAssignments) {
-            const matchingClasses = allClasses.filter(c => c.name === ga.gradeName);
+            const matchingClasses = allClasses.filter(c => 
+                c.name && ga.gradeName && c.name.trim().toLowerCase() === ga.gradeName.trim().toLowerCase()
+            );
             if (matchingClasses.length === 0) continue;
 
             matchingClasses.forEach(cls => {
